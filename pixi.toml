@@ -1,0 +1,10 @@
+[workspace]
+authors = ["James Gregory <james.gregory@utas.edu.au>"]
+channels = ["conda-forge"]
+name = "naturescan-data-platform"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
