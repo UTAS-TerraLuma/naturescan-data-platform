@@ -9,6 +9,7 @@ version = "0.1.0"
 
 [dependencies]
 python = ">=3.14.2,<3.15"
+uvicorn = ">=0.38.0,<0.39"
 
 [feature.geo.dependencies]
 gdal = ">=3.12.0,<4"
@@ -19,14 +20,29 @@ shapely = ">=2.0.0,<3"
 [feature.api-titiler.activation]
 scripts = ["services/api-titiler/titiler_env_vars.sh"]
 
-[feature.api-titiler.dependencies]
-uvicorn = ">=0.38.0,<0.39"
-
 [feature.api-titiler.pypi-dependencies]
 titiler-application = ">=0.26.0, <0.27"
 
-[feature.api-titiler.tasks]
-dev-api-titiler = "uvicorn titiler.application.main:app --reload"
+[feature.api-titiler.tasks.dev-api-titiler]
+args = [
+    { arg = "port", default = "8001" }
+]
+cmd = "uvicorn titiler.application.main:app --reload --port {{ port }}"
+
+[feature.api-stac.tasks.dev-api-stac]
+args = [
+    { arg = "collections_href", default = "https://dev.tern-dronescape.cloud.edu.au/assets/collections.json" },
+    { arg = "port", default = "8002" }
+]
+cmd = """
+STAC_FASTAPI_COLLECTIONS_HREF='{{ collections_href }}' \
+uvicorn stac_fastapi.geoparquet.main:app --reload --port {{ port }}
+"""
+
+[feature.api-stac.pypi-dependencies]
+stac-fastapi-geoparquet = ">=0.0.2, <0.0.3"
+rustac = ">=0.7.0, <0.9.0"
 
 [environments]
 api-titiler = ["geo", "api-titiler"]
+api-stac = ["api-stac"]
