@@ -24,19 +24,17 @@ scripts = ["services/api-titiler/titiler_env_vars.sh"]
 titiler-application = ">=0.26.0, <0.27"
 
 [feature.api-titiler.tasks.dev-api-titiler]
-args = [
-    { arg = "port", default = "8001" }
-]
-cmd = "uvicorn titiler.application.main:app --reload --port {{ port }}"
+description = "Start the TiTiler API."
+cmd = "uvicorn titiler.application.main:app --reload --port 8001"
 
 [feature.api-stac.tasks.dev-api-stac]
+description = "Start the STAC API using provided collections URL."
 args = [
     { arg = "collections_href", default = "https://dev.tern-dronescape.cloud.edu.au/assets/collections.json" },
-    { arg = "port", default = "8002" }
 ]
 cmd = """
 STAC_FASTAPI_COLLECTIONS_HREF='{{ collections_href }}' \
-uvicorn stac_fastapi.geoparquet.main:app --reload --port {{ port }}
+uvicorn stac_fastapi.geoparquet.main:app --reload --port 8002
 """
 
 [feature.api-stac.pypi-dependencies]
