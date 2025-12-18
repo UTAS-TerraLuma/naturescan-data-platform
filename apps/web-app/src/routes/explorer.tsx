@@ -1,3 +1,4 @@
+import MapLayout from "@/components/layouts/MapLayout"
 import { createFileRoute } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/explorer")({
@@ -5,9 +6,5 @@ export const Route = createFileRoute("/explorer")({
 })
 
 function App() {
-    return (
-        <div>
-            <h1>Explorer</h1>
-        </div>
-    )
+    return <MapLayout header={<h1>Explorer</h1>}>Explorer</MapLayout>
 }
