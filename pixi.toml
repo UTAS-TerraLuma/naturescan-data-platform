@@ -56,7 +56,17 @@ depends-on = ["_dev-web-app-install"]
 pnpm = ">=10.26.0,<11"
 nodejs = ">=22.21.1,<22.22"
 
+[feature.notebooks.dependencies]
+jupyterlab = "*"
+ipykernel = "*"
+matplotlib = "*"
+
+[feature.notebooks.tasks.dev-notebooks]
+description = "Start JupyterLab for data exploration and analysis."
+cmd = "jupyter lab --notebook-dir=notebooks"
+
 [environments]
 api-titiler = ["geo", "api-titiler"]
 api-stac = ["api-stac"]
 web-app = ["web-app"]
+notebooks = ["geo", "notebooks"]
