@@ -9,9 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LabellerRouteImport } from './routes/labeller'
+import { Route as ExplorerRouteImport } from './routes/explorer'
 import { Route as ComponentExampleRouteImport } from './routes/component-example'
 import { Route as IndexRouteImport } from './routes/index'
 
+const LabellerRoute = LabellerRouteImport.update({
+  id: '/labeller',
+  path: '/labeller',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExplorerRoute = ExplorerRouteImport.update({
+  id: '/explorer',
+  path: '/explorer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComponentExampleRoute = ComponentExampleRouteImport.update({
   id: '/component-example',
   path: '/component-example',
@@ -26,31 +38,53 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/component-example': typeof ComponentExampleRoute
+  '/explorer': typeof ExplorerRoute
+  '/labeller': typeof LabellerRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/component-example': typeof ComponentExampleRoute
+  '/explorer': typeof ExplorerRoute
+  '/labeller': typeof LabellerRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/component-example': typeof ComponentExampleRoute
+  '/explorer': typeof ExplorerRoute
+  '/labeller': typeof LabellerRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/component-example'
+  fullPaths: '/' | '/component-example' | '/explorer' | '/labeller'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/component-example'
-  id: '__root__' | '/' | '/component-example'
+  to: '/' | '/component-example' | '/explorer' | '/labeller'
+  id: '__root__' | '/' | '/component-example' | '/explorer' | '/labeller'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ComponentExampleRoute: typeof ComponentExampleRoute
+  ExplorerRoute: typeof ExplorerRoute
+  LabellerRoute: typeof LabellerRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/labeller': {
+      id: '/labeller'
+      path: '/labeller'
+      fullPath: '/labeller'
+      preLoaderRoute: typeof LabellerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explorer': {
+      id: '/explorer'
+      path: '/explorer'
+      fullPath: '/explorer'
+      preLoaderRoute: typeof ExplorerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/component-example': {
       id: '/component-example'
       path: '/component-example'
@@ -71,6 +105,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ComponentExampleRoute: ComponentExampleRoute,
+  ExplorerRoute: ExplorerRoute,
+  LabellerRoute: LabellerRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -24,6 +24,8 @@ A Jupyter notebook server can be ran using `pixi run dev-notebooks`. This will a
 Alternatively, if using VSCode, you should be able to select the Kernel directly from `.pixi/envs/notebooks` after the environment has
 been installed (either automatically from above or via `pixi install -e notebooks`).
 
+TODO - Add marimo as an option
+
 ## Deployment
 
 TODO. Ideally using docker ?
