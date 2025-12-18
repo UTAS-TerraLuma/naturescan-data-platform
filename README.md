@@ -7,7 +7,7 @@ split into:
 - `services/` - Containing the backend services:
   - `services/api-titiler` - TiTiler API
   - `services/api-stac` - STAC API powered by stac-geoparquet
-- `notebooks/` - TODO: Any processing / analysis notebooks
+- `notebooks/` - Any processing / analysis notebooks
 - `notebooks_public/` - TODO: Notebooks for publishing online
 
 ## Requirements
@@ -17,6 +17,12 @@ Environments for this repo are managed by [Pixi](https://pixi.sh). Follow the [i
 ## Dev Usages
 
 Run `pixi task list` to get a list of available tasks. Then run using `pixi run`. E.g. `pixi run dev-api-titiler`.
+
+### Notebook Usage
+
+A Jupyter notebook server can be ran using `pixi run dev-notebooks`. This will automatically install the notebooks environment.
+Alternatively, if using VSCode, you should be able to select the Kernel directly from `.pixi/envs/notebooks` after the environment has
+been installed (either automatically from above or via `pixi install -e notebooks`).
 
 ## Deployment
 
