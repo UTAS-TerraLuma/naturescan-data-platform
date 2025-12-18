@@ -8,7 +8,7 @@ version = "0.1.0"
 [tasks]
 
 [dependencies]
-python = ">=3.14.2,<3.15"
+python = ">=3.12,<3.13"
 uvicorn = ">=0.38.0,<0.39"
 
 [feature.geo.dependencies]
@@ -57,16 +57,33 @@ pnpm = ">=10.26.0,<11"
 nodejs = ">=22.21.1,<22.22"
 
 [feature.notebooks.dependencies]
-jupyterlab = "*"
-ipykernel = "*"
-matplotlib = "*"
+jupyterlab = ">=4.5.1,<5"
+ipykernel = ">=7.1.0,<8"
+matplotlib = ">=3.10.8,<4"
 
 [feature.notebooks.tasks.dev-notebooks]
 description = "Start JupyterLab for data exploration and analysis."
 cmd = "jupyter lab --notebook-dir=notebooks"
+
+[feature.api-segmentation.dependencies]
+fastapi = ">=0.125.0,<0.126"
+ultralytics = ">=8.3.240,<9"
+numpy = ">=2.3.5,<3"
+supervision = ">=0.25.1,<0.26"
+
+[feature.api-segmentation.pypi-dependencies]
+pydantic-settings = ">=2.0.0,<3"
+torch = ">=2.9.1, <3"
+torchvision = ">=0.24.1, <0.25"
+
+[feature.api-segmentation.tasks.dev-api-segmentation]
+description = "Start the Segmentation API."
+cwd = "services/api-segmentation"
+cmd = "uvicorn api_segmentation.main:app --reload --port 8003"
 
 [environments]
 api-titiler = ["geo", "api-titiler"]
 api-stac = ["api-stac"]
 web-app = ["web-app"]
 notebooks = ["geo", "notebooks"]
+api-segmentation = ["geo", "api-segmentation"]

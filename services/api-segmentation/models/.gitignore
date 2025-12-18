@@ -1,0 +1,10 @@
+# Ignore all model files
+*.pt
+*.pth
+*.onnx
+*.engine
+*.tflite
+*.mlmodel
+
+# But keep this directory in git
+!.gitignore

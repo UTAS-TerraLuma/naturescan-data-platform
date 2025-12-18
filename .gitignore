@@ -1,3 +1,17 @@
 # pixi environments
 .pixi/*
 !.pixi/config.toml
+
+# Python
+__pycache__
+.pytest_cache
+.ruff_cache
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Node.js
+node_modules
+
+# OS
+.DS_Store
