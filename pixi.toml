@@ -41,10 +41,16 @@ uvicorn stac_fastapi.geoparquet.main:app --reload --port 8002
 stac-fastapi-geoparquet = ">=0.0.2, <0.0.3"
 rustac = ">=0.7.0, <0.9.0"
 
+[feature.web-app.tasks._dev-web-app-install]
+description = "Install the web app dependencies."
+cwd = 'apps/web-app'
+cmd = "pnpm install"
+
 [feature.web-app.tasks.dev-web-app]
 description = "Start the web app in development mode."
 cwd = 'apps/web-app'
 cmd = "pnpm run dev"
+depends-on = ["_dev-web-app-install"]
 
 [feature.web-app.dependencies]
 pnpm = ">=10.26.0,<11"
