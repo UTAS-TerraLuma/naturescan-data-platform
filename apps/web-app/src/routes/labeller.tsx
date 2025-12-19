@@ -1,3 +1,4 @@
+import { CogLoader } from "@/components/cog-loader"
 import { MapLayout } from "@/components/layouts/map-layout"
 import { DeckMap } from "@/components/map/deck-map"
 import { ViewStateDebug } from "@/components/map/view-state-debug"
@@ -9,7 +10,15 @@ export const Route = createFileRoute("/labeller")({
 
 function RouteComponent() {
     return (
-        <MapLayout header={<h1>Labeller</h1>} overlay={<ViewStateDebug />}>
+        <MapLayout
+            header={<h1>Labeller</h1>}
+            overlay={
+                <>
+                    <CogLoader />
+                    <ViewStateDebug />
+                </>
+            }
+        >
             <DeckMap />
         </MapLayout>
     )

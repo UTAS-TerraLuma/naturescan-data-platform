@@ -1,4 +1,4 @@
-import { useMapViewState } from "@/stores/mapViewStateStore"
+import { useMapViewState } from "@/stores/map-view-state-store"
 import { DeckGL } from "@deck.gl/react"
 import { Map } from "react-map-gl/maplibre"
 import "maplibre-gl/dist/maplibre-gl.css"

@@ -1,4 +1,4 @@
-import { useMapViewState } from "@/stores/mapViewStateStore"
+import { useMapViewState } from "@/stores/map-view-state-store"
 
 export function ViewStateDebug() {
     const viewState = useMapViewState((s) => s.viewState)
