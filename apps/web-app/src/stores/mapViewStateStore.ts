@@ -8,9 +8,9 @@ interface MapViewStateStore {
 
 export const useMapViewState = create<MapViewStateStore>((set) => ({
     viewState: {
-        longitude: 0,
-        latitude: 0,
-        zoom: 10,
+        longitude: 146.72470583325884,
+        latitude: -42.182031003074464,
+        zoom: 7.5,
     },
     updateViewState: (newViewState) =>
         set((state) => ({

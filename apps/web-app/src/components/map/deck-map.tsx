@@ -1,6 +1,7 @@
 import { useMapViewState } from "@/stores/mapViewStateStore"
 import { DeckGL } from "@deck.gl/react"
-import Map from "react-map-gl"
+import { Map } from "react-map-gl/maplibre"
+import "maplibre-gl/dist/maplibre-gl.css"
 
 export function DeckMap() {
     const viewState = useMapViewState((s) => s.viewState)
@@ -12,7 +13,7 @@ export function DeckMap() {
             onViewStateChange={({ viewState }) => updateViewState(viewState)}
             controller
         >
-            <Map></Map>
+            <Map mapStyle="https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json" />
         </DeckGL>
     )
 }

@@ -1,3 +1,6 @@
+import { MapLayout } from "@/components/layouts/map-layout"
+import { DeckMap } from "@/components/map/deck-map"
+import { ViewStateDebug } from "@/components/map/view-state-debug"
 import { createFileRoute } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/labeller")({
@@ -5,5 +8,9 @@ export const Route = createFileRoute("/labeller")({
 })
 
 function RouteComponent() {
-    return <div>Hello "/labeller"!</div>
+    return (
+        <MapLayout header={<h1>Labeller</h1>} overlay={<ViewStateDebug />}>
+            <DeckMap />
+        </MapLayout>
+    )
 }
