@@ -17,10 +17,17 @@ export const useMapViewState = create<MapViewStateStore>()(
                 longitude: 146.72470583325884,
                 latitude: -42.182031003074464,
                 zoom: 7.5,
+
+                // Increase default maxZoom
+                maxZoom: 24,
             },
             updateViewState: (newViewState) =>
                 set((state) => ({
-                    viewState: { ...state.viewState, ...newViewState },
+                    viewState: {
+                        ...state.viewState,
+                        ...newViewState,
+                        maxZoom: 24,
+                    },
                 })),
         }),
         { name: "map-view-state" },
