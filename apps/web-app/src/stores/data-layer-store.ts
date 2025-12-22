@@ -2,7 +2,7 @@ import type { Bounds } from "@/types/spatial"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
-interface RgbCogDataLayer {
+export interface RgbCogDataLayer {
     type: "rgb-cog"
     id: string
     cogUrl: string

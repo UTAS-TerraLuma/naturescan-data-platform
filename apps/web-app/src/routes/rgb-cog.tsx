@@ -5,7 +5,7 @@ import { ViewStateDebug } from "@/components/map/view-state-debug"
 import { DataLayerOverlay } from "@/components/overlays/data-layer"
 import { createFileRoute } from "@tanstack/react-router"
 
-export const Route = createFileRoute("/labeller")({
+export const Route = createFileRoute("/rgb-cog")({
     component: RouteComponent,
 })
 

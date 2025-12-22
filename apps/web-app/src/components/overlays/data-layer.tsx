@@ -52,6 +52,7 @@ function RgbCogDataLayer({
                         ></Input>
                         <Button
                             type="button"
+                            size="icon"
                             variant="default"
                             onClick={() => fitBounds(bounds)}
                         >
@@ -59,6 +60,7 @@ function RgbCogDataLayer({
                         </Button>
                         <Button
                             type="button"
+                            size="icon"
                             variant="destructive"
                             onClick={() => removeDataLayer(id)}
                         >

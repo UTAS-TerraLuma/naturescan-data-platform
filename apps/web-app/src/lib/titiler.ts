@@ -6,20 +6,9 @@ const TITILER_URL = import.meta.env.VITE_TITILER_URL
 export function getRgbXyzUrl(cogUrl: string) {
     return createTitilerUrl("/cog/tiles/WebMercatorQuad/{z}/{x}/{y}@2x", {
         url: cogUrl,
-        noData: "255",
+        // nodata: 255,
     })
 }
-
-// export async function validateCog(cogUrl: string) {
-//     const url = createTitilerUrl("/cog/validate", {
-//         url: cogUrl,
-//     })
-
-//     const response = await fetch(url)
-//     const data = await response.json()
-
-//     return data
-// }
 
 export async function getCogBoundsWGS84(cogUrl: string): Promise<Bounds> {
     const url = createTitilerUrl("/cog/info.geojson", {
@@ -53,5 +42,7 @@ function createTitilerUrl(
         }
     }
 
-    return TITILER_URL + apiRoute + "?" + params.toString()
+    const url = TITILER_URL + apiRoute + "?" + params.toString()
+
+    return url
 }

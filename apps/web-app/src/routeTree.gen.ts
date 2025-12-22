@@ -9,14 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LabellerRouteImport } from './routes/labeller'
+import { Route as RgbCogRouteImport } from './routes/rgb-cog'
 import { Route as ExplorerRouteImport } from './routes/explorer'
 import { Route as ComponentExampleRouteImport } from './routes/component-example'
 import { Route as IndexRouteImport } from './routes/index'
 
-const LabellerRoute = LabellerRouteImport.update({
-  id: '/labeller',
-  path: '/labeller',
+const RgbCogRoute = RgbCogRouteImport.update({
+  id: '/rgb-cog',
+  path: '/rgb-cog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExplorerRoute = ExplorerRouteImport.update({
@@ -39,43 +39,43 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/component-example': typeof ComponentExampleRoute
   '/explorer': typeof ExplorerRoute
-  '/labeller': typeof LabellerRoute
+  '/rgb-cog': typeof RgbCogRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/component-example': typeof ComponentExampleRoute
   '/explorer': typeof ExplorerRoute
-  '/labeller': typeof LabellerRoute
+  '/rgb-cog': typeof RgbCogRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/component-example': typeof ComponentExampleRoute
   '/explorer': typeof ExplorerRoute
-  '/labeller': typeof LabellerRoute
+  '/rgb-cog': typeof RgbCogRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/component-example' | '/explorer' | '/labeller'
+  fullPaths: '/' | '/component-example' | '/explorer' | '/rgb-cog'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/component-example' | '/explorer' | '/labeller'
-  id: '__root__' | '/' | '/component-example' | '/explorer' | '/labeller'
+  to: '/' | '/component-example' | '/explorer' | '/rgb-cog'
+  id: '__root__' | '/' | '/component-example' | '/explorer' | '/rgb-cog'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ComponentExampleRoute: typeof ComponentExampleRoute
   ExplorerRoute: typeof ExplorerRoute
-  LabellerRoute: typeof LabellerRoute
+  RgbCogRoute: typeof RgbCogRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/labeller': {
-      id: '/labeller'
-      path: '/labeller'
-      fullPath: '/labeller'
-      preLoaderRoute: typeof LabellerRouteImport
+    '/rgb-cog': {
+      id: '/rgb-cog'
+      path: '/rgb-cog'
+      fullPath: '/rgb-cog'
+      preLoaderRoute: typeof RgbCogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/explorer': {
@@ -106,7 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ComponentExampleRoute: ComponentExampleRoute,
   ExplorerRoute: ExplorerRoute,
-  LabellerRoute: LabellerRoute,
+  RgbCogRoute: RgbCogRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
