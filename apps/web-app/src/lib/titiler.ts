@@ -21,26 +21,21 @@ export function getRgbXyzUrl(cogUrl: string) {
 //     return data
 // }
 
-export async function getCogBounds(cogUrl: string): Promise<Bounds> {
-    const url = createTitilerUrl("/cog/info", {
+export async function getCogBoundsWGS84(cogUrl: string): Promise<Bounds> {
+    const url = createTitilerUrl("/cog/info.geojson", {
         url: cogUrl,
     })
-
     const response = await fetch(url, {
         headers: {
             Accept: "application/json",
         },
     })
     const data = await response.json()
-
     const schema = z.object({
-        crs: z.string(),
-        bounds: z.tuple([z.number(), z.number(), z.number(), z.number()]),
+        bbox: z.tuple([z.number(), z.number(), z.number(), z.number()]),
     })
-
     const boundsData = schema.parse(data)
-
-    return boundsData.bounds
+    return boundsData.bbox
 }
 
 function createTitilerUrl(
