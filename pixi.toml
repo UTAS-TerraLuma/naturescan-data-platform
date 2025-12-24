@@ -61,6 +61,7 @@ jupyterlab = ">=4.5.1,<5"
 ipykernel = ">=7.1.0,<8"
 matplotlib = ">=3.10.8,<4"
 rio-stac = ">=0.12.0,<0.13"
+pystac = ">=1.14.2,<2"
 
 [feature.notebooks.tasks.dev-notebooks]
 description = "Start JupyterLab for data exploration and analysis."
