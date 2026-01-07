@@ -2,6 +2,7 @@
 
 This repository contains the code and service definitions for the NatureScan data platform. Currently
 split into:
+
 - `apps/` - Containing the any user facing applications:
   - `apps/web-app` - The primary web application
 - `services/` - Containing the backend services:
