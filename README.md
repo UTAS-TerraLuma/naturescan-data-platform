@@ -8,6 +8,7 @@ split into:
 - `services/` - Containing the backend services:
   - `services/api-titiler` - TiTiler API
   - `services/api-stac` - STAC API powered by stac-geoparquet
+  - `services/asset-server` - A dev only asset server to serve local files on a URL (for serving COGs and STAC items during dev)
 - `notebooks/` - Any processing / analysis notebooks
 - `notebooks_public/` - TODO: Notebooks for publishing online
 
