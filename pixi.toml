@@ -5,8 +5,6 @@ name = "naturescan-data-platform"
 platforms = ["linux-64", "osx-arm64"]
 version = "0.1.0"
 
-[tasks]
-
 [dependencies]
 python = ">=3.12,<3.13"
 uvicorn = ">=0.38.0,<0.39"
@@ -86,9 +84,18 @@ description = "Start the Segmentation API."
 cwd = "services/api-segmentation"
 cmd = "uvicorn api_segmentation.main:app --reload --port 8003"
 
+[feature.asset-server.dependencies]
+nodejs = "*"
+
+[feature.asset-server.tasks.dev-asset-server]
+description = "Start the asset server at provided location."
+args = ["path"]
+cmd = "npx http-server {{ path }} --port 8010 --cors"
+
 [environments]
 api-titiler = ["geo", "api-titiler"]
 api-stac = ["api-stac"]
 web-app = ["web-app"]
 notebooks = ["geo", "notebooks"]
 api-segmentation = ["geo", "api-segmentation"]
+asset-server = ["asset-server"]
