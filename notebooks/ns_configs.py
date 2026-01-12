@@ -1,4 +1,5 @@
 from ns_types import BandConfig, AssetConfig, ItemConfig
+from pathlib import Path
 
 RGB_ASSET_CONFIG = AssetConfig(
     title="RGB Orthmosaic Asset",
@@ -66,16 +67,29 @@ MS_ASSET_CONFIG = AssetConfig(
     ],
 )
 
-RGB_ITEM_CONFIG = ItemConfig(
-    title="RGB Orthomosaic Item",
-    instruments=["dji-mavic-3m-rgb-camera"],
-    naturescan_data_product="rgb",
-    asset_config=RGB_ASSET_CONFIG,
-)
 
-MS_ITEM_CONFIG = ItemConfig(
-    title="MS Orthomosaic Item",
-    instruments=["dji-mavic-3m-ms-camera"],
-    naturescan_data_product="ms",
-    asset_config=MS_ASSET_CONFIG,
-)
+def get_rgb_item_config(
+    asset_href: str | None = None, 
+    thumbnail_href: str | None = None
+) -> ItemConfig:
+    return ItemConfig(
+        title="RGB Orthomosaic Item",
+        instruments=["dji-mavic-3m-rgb-camera"],
+        naturescan_data_product="rgb",
+        asset_config=RGB_ASSET_CONFIG,
+        asset_href=asset_href,
+        thumbnail_href=thumbnail_href,
+    )
+
+def get_ms_item_config(
+    asset_href: str | None = None, 
+    thumbnail_href: str | None = None
+) -> ItemConfig:
+    return ItemConfig(
+        title="MS Orthomosaic Item",
+        instruments=["dji-mavic-3m-ms-camera"],
+        naturescan_data_product="ms",
+        asset_config=MS_ASSET_CONFIG,
+        asset_href=asset_href,
+        thumbnail_href=thumbnail_href,
+    )

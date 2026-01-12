@@ -75,7 +75,7 @@ def create_bands_info(cog_path: Path, band_configs: list[BandConfig]) -> any:
     return bands
 
 
-def create_main_asset(cog_path: Path, asset_config: AssetConfig) -> pystac.Asset:
+def create_main_asset(cog_path: Path, asset_config: AssetConfig, asset_href: str | None = None) -> pystac.Asset:
     """
     Create the main STAC asset object for the given asset and config.
 
@@ -119,7 +119,7 @@ def create_main_asset(cog_path: Path, asset_config: AssetConfig) -> pystac.Asset
         raise Exception(f"Unhandled data type {data_type}")
 
     asset = pystac.Asset(
-        href=str(cog_path),
+        href=asset_href if asset_href else str(cog_path),
         title=asset_config.title,
         description=asset_config.description,
         roles=["data"],
@@ -135,7 +135,7 @@ def create_main_asset(cog_path: Path, asset_config: AssetConfig) -> pystac.Asset
     return asset
 
 
-def create_thumbnail_asset(thumbnail_path: Path) -> pystac.Asset:
+def create_thumbnail_asset(thumbnail_path: Path, thumbnail_href: str | None = None) -> pystac.Asset:
     """
     Create a thumbnail asset item
 
@@ -152,7 +152,7 @@ def create_thumbnail_asset(thumbnail_path: Path) -> pystac.Asset:
     width, height = thumbnail_info["size"]
 
     asset = pystac.Asset(
-        href=str(thumbnail_path),
+        href=thumbnail_href if thumbnail_href else str(thumbnail_path),
         roles=["thumbnail"],
         media_type=pystac.MediaType.PNG,
         extra_fields={
@@ -218,8 +218,8 @@ def create_item(cog_path: Path, thumbnail_path: Path, item_config: ItemConfig):
             "naturescan:data_product": item_config.naturescan_data_product,
         },
         assets={
-            "main": create_main_asset(cog_path, item_config.asset_config),
-            "thumbnail": create_thumbnail_asset(thumbnail_path),
+            "main": create_main_asset(cog_path, item_config.asset_config, item_config.asset_href),
+            "thumbnail": create_thumbnail_asset(thumbnail_path, item_config.thumbnail_href),
         },
         # Add Raster and EO extensions 2.0.0 as I've done them manually
         stac_extensions=[

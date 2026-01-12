@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from pathlib import Path
 
 
 class BandConfig(BaseModel):
@@ -26,3 +27,5 @@ class ItemConfig(BaseModel):
     instruments: list[str]
     naturescan_data_product: str
     asset_config: AssetConfig
+    asset_href: str | None = None
+    thumbnail_href: str | None = None
