@@ -4,7 +4,7 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Scan, X } from "lucide-react"
-import { fitBounds } from "@/stores/map-view-state-store"
+import { useMapViewState } from "@/stores/map-view-state-store"
 
 export function DataLayerOverlay() {
     const dataLayers = useDataLayerStore((s) => s.dataLayers)
@@ -36,6 +36,7 @@ function RgbCogDataLayer({
     bounds: Bounds
 }) {
     const removeDataLayer = useDataLayerStore((s) => s.removeDataLayer)
+    const fitBounds = useMapViewState((s) => s.fitBounds)
 
     return (
         <>

@@ -1,12 +1,20 @@
 import type { Bounds } from "@/types/spatial"
 import * as z from "zod"
 
-const TITILER_URL = import.meta.env.VITE_TITILER_URL
+const TITILER_URL = "http://localhost:8001"
+const XYZ_TILES_ROUTE = "/cog/tiles/WebMercatorQuad/{z}/{x}/{y}@2x.png"
 
 export function getRgbXyzUrl(cogUrl: string) {
-    return createTitilerUrl("/cog/tiles/WebMercatorQuad/{z}/{x}/{y}@2x", {
+    return createTitilerUrl(XYZ_TILES_ROUTE, {
         url: cogUrl,
         // nodata: 255,
+    })
+}
+
+export function getTilesUrl(cogUrl: string, params: SearchParams = {}) {
+    return createTitilerUrl(XYZ_TILES_ROUTE, {
+        url: cogUrl,
+        ...params,
     })
 }
 
@@ -27,9 +35,11 @@ export async function getCogBoundsWGS84(cogUrl: string): Promise<Bounds> {
     return boundsData.bbox
 }
 
+type SearchParams = Record<string, string | number | Array<string | number>>
+
 function createTitilerUrl(
     apiRoute: string,
-    searchParams: Record<string, string | number | Array<string | number>>,
+    searchParams: SearchParams = {},
 ): string {
     const params = new URLSearchParams()
 
@@ -46,3 +56,5 @@ function createTitilerUrl(
 
     return url
 }
+
+// export

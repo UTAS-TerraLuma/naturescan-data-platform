@@ -16,8 +16,11 @@ export function CogLoader() {
         e.preventDefault()
 
         try {
+            console.log("TRY")
             const cogUrl = zodUrl().parse(inputString)
+            console.log({ cogUrl })
             const bounds = await getCogBoundsWGS84(cogUrl)
+            console.log({ bounds })
             addDataLayer({
                 id: cogUrl,
                 type: "rgb-cog",

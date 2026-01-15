@@ -1,11 +1,9 @@
 import { BitmapLayer } from "@deck.gl/layers"
-import { type Layer } from "@deck.gl/core"
+
 import { TileLayer } from "@deck.gl/geo-layers"
-import {
-    useDataLayerStore,
-    type RgbCogDataLayer,
-} from "@/stores/data-layer-store"
+import { type RgbCogDataLayer } from "@/stores/data-layer-store"
 import { getRgbXyzUrl } from "./titiler"
+import { COGLayer } from "@developmentseed/deck.gl-geotiff"
 
 export function getXyzTileLayer(xyzUrl: string | null, id?: string) {
     if (!xyzUrl) return null
@@ -34,11 +32,10 @@ export function getXyzTileLayer(xyzUrl: string | null, id?: string) {
     })
 }
 
-function getRgbCogLayer(config: RgbCogDataLayer) {
+function getTitilerRgbCogLayer(config: RgbCogDataLayer) {
     const rgbXyzUrl = getRgbXyzUrl(config.cogUrl)
     return new TileLayer({
         id: config.id,
-        minZoom: 18,
         extent: config.bounds,
         data: rgbXyzUrl,
 
@@ -63,16 +60,9 @@ function getRgbCogLayer(config: RgbCogDataLayer) {
     })
 }
 
-export function useLayers(): (Layer | null)[] {
-    const dataLayers = useDataLayerStore((s) => s.dataLayers)
-
-    return dataLayers.map((d) => {
-        let layer = null
-
-        if (d.type == "rgb-cog") {
-            layer = getRgbCogLayer(d)
-        }
-
-        return layer
+function getDirectRgbCogLayer(config: RgbCogDataLayer) {
+    return new COGLayer({
+        id: "cog-layer",
+        geotiff: config.cogUrl,
     })
 }

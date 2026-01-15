@@ -8,11 +8,12 @@ interface MapViewStateStore {
     // passes width and height as part of viewState
     viewState: MapViewState & { width?: number; height?: number }
     updateViewState: (vs: Partial<MapViewState>) => void
+    fitBounds: (bounds: Bounds) => void
 }
 
 export const useMapViewState = create<MapViewStateStore>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             viewState: {
                 longitude: 146.72470583325884,
                 latitude: -42.182031003074464,
@@ -29,33 +30,58 @@ export const useMapViewState = create<MapViewStateStore>()(
                         maxZoom: 24,
                     },
                 })),
+            fitBounds: (bounds: Bounds) => {
+                const [xMin, yMin, xMax, yMax] = bounds
+                const { viewState, updateViewState } = get()
+                const { width, height } = viewState
+
+                // If we don't have the size of the viewport
+                // we can't fit the boudns. Instead just center it
+                if (!(width && height)) {
+                    const longitude = (xMin + xMax) / 2
+                    const latitude = (yMin + yMax) / 2
+                    updateViewState({ longitude, latitude })
+                }
+
+                const viewport = new WebMercatorViewport({
+                    width,
+                    height,
+                })
+
+                const { longitude, latitude, zoom } = viewport.fitBounds([
+                    [xMin, yMin],
+                    [xMax, yMax],
+                ])
+
+                updateViewState({ longitude, latitude, zoom })
+            },
         }),
         { name: "map-view-state" },
     ),
 )
 
-export function fitBounds(bounds: Bounds) {
-    const [xMin, yMin, xMax, yMax] = bounds
-    const { viewState, updateViewState } = useMapViewState.getState()
-    const { width, height } = viewState
+// export function fitBounds(bounds: Bounds) {
+//     const [xMin, yMin, xMax, yMax] = bounds
+//     const { viewState, updateViewState } = useMapViewState.getState()
+//     const { width, height } = viewState
 
-    // If we don't have the size of the viewport
-    // we can't fit the boudns. Instead just center it
-    if (!(width && height)) {
-        const longitude = (xMin + xMax) / 2
-        const latitude = (yMin + yMax) / 2
-        updateViewState({ longitude, latitude })
-    }
+//     // If we don't have the size of the viewport
+//     // we can't fit the boudns. Instead just center it
+//     if (!(width && height)) {
+//         const longitude = (xMin + xMax) / 2
+//         const latitude = (yMin + yMax) / 2
+//         updateViewState({ longitude, latitude })
+//     }
 
-    const viewport = new WebMercatorViewport({
-        width,
-        height,
-    })
+//     const viewport = new WebMercatorViewport({
+//         width,
+//         height,
+//     })
 
-    const { longitude, latitude, zoom } = viewport.fitBounds([
-        [xMin, yMin],
-        [xMax, yMax],
-    ])
+//     const { longitude, latitude, zoom } = viewport.fitBounds([
+//         [xMin, yMin],
+//         [xMax, yMax],
+//     ])
 
-    updateViewState({ longitude, latitude, zoom })
-}
+//     updateViewState({ longitude, latitude, zoom })
+// }

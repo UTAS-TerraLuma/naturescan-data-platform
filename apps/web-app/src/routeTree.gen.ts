@@ -10,18 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RgbCogRouteImport } from './routes/rgb-cog'
-import { Route as ExplorerRouteImport } from './routes/explorer'
 import { Route as ComponentExampleRouteImport } from './routes/component-example'
+import { Route as ExplorerRouteRouteImport } from './routes/explorer.route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ExplorerIndexRouteImport } from './routes/explorer.index'
+import { Route as ExplorerCollectionIdRouteRouteImport } from './routes/explorer.$collectionId.route'
+import { Route as ExplorerCollectionIdIndexRouteImport } from './routes/explorer.$collectionId.index'
+import { Route as ExplorerCollectionIdItemIdRouteImport } from './routes/explorer.$collectionId.$itemId'
 
 const RgbCogRoute = RgbCogRouteImport.update({
   id: '/rgb-cog',
   path: '/rgb-cog',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExplorerRoute = ExplorerRouteImport.update({
-  id: '/explorer',
-  path: '/explorer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComponentExampleRoute = ComponentExampleRouteImport.update({
@@ -29,43 +28,104 @@ const ComponentExampleRoute = ComponentExampleRouteImport.update({
   path: '/component-example',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExplorerRouteRoute = ExplorerRouteRouteImport.update({
+  id: '/explorer',
+  path: '/explorer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExplorerIndexRoute = ExplorerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ExplorerRouteRoute,
+} as any)
+const ExplorerCollectionIdRouteRoute =
+  ExplorerCollectionIdRouteRouteImport.update({
+    id: '/$collectionId',
+    path: '/$collectionId',
+    getParentRoute: () => ExplorerRouteRoute,
+  } as any)
+const ExplorerCollectionIdIndexRoute =
+  ExplorerCollectionIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ExplorerCollectionIdRouteRoute,
+  } as any)
+const ExplorerCollectionIdItemIdRoute =
+  ExplorerCollectionIdItemIdRouteImport.update({
+    id: '/$itemId',
+    path: '/$itemId',
+    getParentRoute: () => ExplorerCollectionIdRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/explorer': typeof ExplorerRouteRouteWithChildren
   '/component-example': typeof ComponentExampleRoute
-  '/explorer': typeof ExplorerRoute
   '/rgb-cog': typeof RgbCogRoute
+  '/explorer/$collectionId': typeof ExplorerCollectionIdRouteRouteWithChildren
+  '/explorer/': typeof ExplorerIndexRoute
+  '/explorer/$collectionId/$itemId': typeof ExplorerCollectionIdItemIdRoute
+  '/explorer/$collectionId/': typeof ExplorerCollectionIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/component-example': typeof ComponentExampleRoute
-  '/explorer': typeof ExplorerRoute
   '/rgb-cog': typeof RgbCogRoute
+  '/explorer': typeof ExplorerIndexRoute
+  '/explorer/$collectionId/$itemId': typeof ExplorerCollectionIdItemIdRoute
+  '/explorer/$collectionId': typeof ExplorerCollectionIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/explorer': typeof ExplorerRouteRouteWithChildren
   '/component-example': typeof ComponentExampleRoute
-  '/explorer': typeof ExplorerRoute
   '/rgb-cog': typeof RgbCogRoute
+  '/explorer/$collectionId': typeof ExplorerCollectionIdRouteRouteWithChildren
+  '/explorer/': typeof ExplorerIndexRoute
+  '/explorer/$collectionId/$itemId': typeof ExplorerCollectionIdItemIdRoute
+  '/explorer/$collectionId/': typeof ExplorerCollectionIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/component-example' | '/explorer' | '/rgb-cog'
+  fullPaths:
+    | '/'
+    | '/explorer'
+    | '/component-example'
+    | '/rgb-cog'
+    | '/explorer/$collectionId'
+    | '/explorer/'
+    | '/explorer/$collectionId/$itemId'
+    | '/explorer/$collectionId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/component-example' | '/explorer' | '/rgb-cog'
-  id: '__root__' | '/' | '/component-example' | '/explorer' | '/rgb-cog'
+  to:
+    | '/'
+    | '/component-example'
+    | '/rgb-cog'
+    | '/explorer'
+    | '/explorer/$collectionId/$itemId'
+    | '/explorer/$collectionId'
+  id:
+    | '__root__'
+    | '/'
+    | '/explorer'
+    | '/component-example'
+    | '/rgb-cog'
+    | '/explorer/$collectionId'
+    | '/explorer/'
+    | '/explorer/$collectionId/$itemId'
+    | '/explorer/$collectionId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ExplorerRouteRoute: typeof ExplorerRouteRouteWithChildren
   ComponentExampleRoute: typeof ComponentExampleRoute
-  ExplorerRoute: typeof ExplorerRoute
   RgbCogRoute: typeof RgbCogRoute
 }
 
@@ -78,18 +138,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RgbCogRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/explorer': {
-      id: '/explorer'
-      path: '/explorer'
-      fullPath: '/explorer'
-      preLoaderRoute: typeof ExplorerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/component-example': {
       id: '/component-example'
       path: '/component-example'
       fullPath: '/component-example'
       preLoaderRoute: typeof ComponentExampleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explorer': {
+      id: '/explorer'
+      path: '/explorer'
+      fullPath: '/explorer'
+      preLoaderRoute: typeof ExplorerRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -99,13 +159,71 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/explorer/': {
+      id: '/explorer/'
+      path: '/'
+      fullPath: '/explorer/'
+      preLoaderRoute: typeof ExplorerIndexRouteImport
+      parentRoute: typeof ExplorerRouteRoute
+    }
+    '/explorer/$collectionId': {
+      id: '/explorer/$collectionId'
+      path: '/$collectionId'
+      fullPath: '/explorer/$collectionId'
+      preLoaderRoute: typeof ExplorerCollectionIdRouteRouteImport
+      parentRoute: typeof ExplorerRouteRoute
+    }
+    '/explorer/$collectionId/': {
+      id: '/explorer/$collectionId/'
+      path: '/'
+      fullPath: '/explorer/$collectionId/'
+      preLoaderRoute: typeof ExplorerCollectionIdIndexRouteImport
+      parentRoute: typeof ExplorerCollectionIdRouteRoute
+    }
+    '/explorer/$collectionId/$itemId': {
+      id: '/explorer/$collectionId/$itemId'
+      path: '/$itemId'
+      fullPath: '/explorer/$collectionId/$itemId'
+      preLoaderRoute: typeof ExplorerCollectionIdItemIdRouteImport
+      parentRoute: typeof ExplorerCollectionIdRouteRoute
+    }
   }
 }
 
+interface ExplorerCollectionIdRouteRouteChildren {
+  ExplorerCollectionIdItemIdRoute: typeof ExplorerCollectionIdItemIdRoute
+  ExplorerCollectionIdIndexRoute: typeof ExplorerCollectionIdIndexRoute
+}
+
+const ExplorerCollectionIdRouteRouteChildren: ExplorerCollectionIdRouteRouteChildren =
+  {
+    ExplorerCollectionIdItemIdRoute: ExplorerCollectionIdItemIdRoute,
+    ExplorerCollectionIdIndexRoute: ExplorerCollectionIdIndexRoute,
+  }
+
+const ExplorerCollectionIdRouteRouteWithChildren =
+  ExplorerCollectionIdRouteRoute._addFileChildren(
+    ExplorerCollectionIdRouteRouteChildren,
+  )
+
+interface ExplorerRouteRouteChildren {
+  ExplorerCollectionIdRouteRoute: typeof ExplorerCollectionIdRouteRouteWithChildren
+  ExplorerIndexRoute: typeof ExplorerIndexRoute
+}
+
+const ExplorerRouteRouteChildren: ExplorerRouteRouteChildren = {
+  ExplorerCollectionIdRouteRoute: ExplorerCollectionIdRouteRouteWithChildren,
+  ExplorerIndexRoute: ExplorerIndexRoute,
+}
+
+const ExplorerRouteRouteWithChildren = ExplorerRouteRoute._addFileChildren(
+  ExplorerRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ExplorerRouteRoute: ExplorerRouteRouteWithChildren,
   ComponentExampleRoute: ComponentExampleRoute,
-  ExplorerRoute: ExplorerRoute,
   RgbCogRoute: RgbCogRoute,
 }
 export const routeTree = rootRouteImport

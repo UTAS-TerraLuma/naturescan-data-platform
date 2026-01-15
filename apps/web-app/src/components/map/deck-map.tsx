@@ -2,13 +2,13 @@ import { useMapViewState } from "@/stores/map-view-state-store"
 import { DeckGL } from "@deck.gl/react"
 import { Map } from "react-map-gl/maplibre"
 import "maplibre-gl/dist/maplibre-gl.css"
-import { useLayers } from "@/lib/deck"
+import { useDeckLayers } from "@/stores/deck-layer-store"
 
 export function DeckMap() {
     const viewState = useMapViewState((s) => s.viewState)
     const updateViewState = useMapViewState((s) => s.updateViewState)
 
-    const layers = useLayers()
+    const layers = useDeckLayers((s) => s.layers)
 
     return (
         <DeckGL
