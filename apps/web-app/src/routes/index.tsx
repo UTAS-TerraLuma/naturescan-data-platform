@@ -8,7 +8,6 @@ function App() {
     return (
         <div>
             <Link to="/explorer">Explorer</Link>
-            <Link to="/rgb-cog">RGB COG</Link>
         </div>
     )
 }

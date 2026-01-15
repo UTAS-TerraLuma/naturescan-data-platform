@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as RgbCogRouteImport } from './routes/rgb-cog'
 import { Route as ComponentExampleRouteImport } from './routes/component-example'
 import { Route as ExplorerRouteRouteImport } from './routes/explorer.route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -18,11 +17,6 @@ import { Route as ExplorerCollectionIdRouteRouteImport } from './routes/explorer
 import { Route as ExplorerCollectionIdIndexRouteImport } from './routes/explorer.$collectionId.index'
 import { Route as ExplorerCollectionIdItemIdRouteImport } from './routes/explorer.$collectionId.$itemId'
 
-const RgbCogRoute = RgbCogRouteImport.update({
-  id: '/rgb-cog',
-  path: '/rgb-cog',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ComponentExampleRoute = ComponentExampleRouteImport.update({
   id: '/component-example',
   path: '/component-example',
@@ -66,7 +60,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/explorer': typeof ExplorerRouteRouteWithChildren
   '/component-example': typeof ComponentExampleRoute
-  '/rgb-cog': typeof RgbCogRoute
   '/explorer/$collectionId': typeof ExplorerCollectionIdRouteRouteWithChildren
   '/explorer/': typeof ExplorerIndexRoute
   '/explorer/$collectionId/$itemId': typeof ExplorerCollectionIdItemIdRoute
@@ -75,7 +68,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/component-example': typeof ComponentExampleRoute
-  '/rgb-cog': typeof RgbCogRoute
   '/explorer': typeof ExplorerIndexRoute
   '/explorer/$collectionId/$itemId': typeof ExplorerCollectionIdItemIdRoute
   '/explorer/$collectionId': typeof ExplorerCollectionIdIndexRoute
@@ -85,7 +77,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/explorer': typeof ExplorerRouteRouteWithChildren
   '/component-example': typeof ComponentExampleRoute
-  '/rgb-cog': typeof RgbCogRoute
   '/explorer/$collectionId': typeof ExplorerCollectionIdRouteRouteWithChildren
   '/explorer/': typeof ExplorerIndexRoute
   '/explorer/$collectionId/$itemId': typeof ExplorerCollectionIdItemIdRoute
@@ -97,7 +88,6 @@ export interface FileRouteTypes {
     | '/'
     | '/explorer'
     | '/component-example'
-    | '/rgb-cog'
     | '/explorer/$collectionId'
     | '/explorer/'
     | '/explorer/$collectionId/$itemId'
@@ -106,7 +96,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/component-example'
-    | '/rgb-cog'
     | '/explorer'
     | '/explorer/$collectionId/$itemId'
     | '/explorer/$collectionId'
@@ -115,7 +104,6 @@ export interface FileRouteTypes {
     | '/'
     | '/explorer'
     | '/component-example'
-    | '/rgb-cog'
     | '/explorer/$collectionId'
     | '/explorer/'
     | '/explorer/$collectionId/$itemId'
@@ -126,18 +114,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ExplorerRouteRoute: typeof ExplorerRouteRouteWithChildren
   ComponentExampleRoute: typeof ComponentExampleRoute
-  RgbCogRoute: typeof RgbCogRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/rgb-cog': {
-      id: '/rgb-cog'
-      path: '/rgb-cog'
-      fullPath: '/rgb-cog'
-      preLoaderRoute: typeof RgbCogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/component-example': {
       id: '/component-example'
       path: '/component-example'
@@ -224,7 +204,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ExplorerRouteRoute: ExplorerRouteRouteWithChildren,
   ComponentExampleRoute: ComponentExampleRoute,
-  RgbCogRoute: RgbCogRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

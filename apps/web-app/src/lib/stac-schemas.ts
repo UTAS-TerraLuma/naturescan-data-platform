@@ -40,6 +40,8 @@ const mainAssetSchema = z.object({
     type: z.literal("image/tiff; application=geotiff; profile=cloud-optimized"),
 })
 
+export type StacMainAsset = z.infer<typeof mainAssetSchema>
+
 const thumbnailAssetSchema = z.object({
     href: z.string(),
     "proj:shape": z.array(z.number()).length(2),
