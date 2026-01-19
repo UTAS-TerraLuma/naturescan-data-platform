@@ -15,7 +15,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExplorerIndexRouteImport } from './routes/explorer.index'
 import { Route as ExplorerCollectionIdRouteRouteImport } from './routes/explorer.$collectionId.route'
 import { Route as ExplorerCollectionIdIndexRouteImport } from './routes/explorer.$collectionId.index'
-import { Route as ExplorerCollectionIdItemIdRouteImport } from './routes/explorer.$collectionId.$itemId'
+import { Route as ExplorerCollectionIdItemIdRouteRouteImport } from './routes/explorer.$collectionId.$itemId.route'
+import { Route as ExplorerCollectionIdItemIdLabelRouteImport } from './routes/explorer.$collectionId.$itemId.label'
 
 const ComponentExampleRoute = ComponentExampleRouteImport.update({
   id: '/component-example',
@@ -49,11 +50,17 @@ const ExplorerCollectionIdIndexRoute =
     path: '/',
     getParentRoute: () => ExplorerCollectionIdRouteRoute,
   } as any)
-const ExplorerCollectionIdItemIdRoute =
-  ExplorerCollectionIdItemIdRouteImport.update({
+const ExplorerCollectionIdItemIdRouteRoute =
+  ExplorerCollectionIdItemIdRouteRouteImport.update({
     id: '/$itemId',
     path: '/$itemId',
     getParentRoute: () => ExplorerCollectionIdRouteRoute,
+  } as any)
+const ExplorerCollectionIdItemIdLabelRoute =
+  ExplorerCollectionIdItemIdLabelRouteImport.update({
+    id: '/label',
+    path: '/label',
+    getParentRoute: () => ExplorerCollectionIdItemIdRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -62,15 +69,17 @@ export interface FileRoutesByFullPath {
   '/component-example': typeof ComponentExampleRoute
   '/explorer/$collectionId': typeof ExplorerCollectionIdRouteRouteWithChildren
   '/explorer/': typeof ExplorerIndexRoute
-  '/explorer/$collectionId/$itemId': typeof ExplorerCollectionIdItemIdRoute
+  '/explorer/$collectionId/$itemId': typeof ExplorerCollectionIdItemIdRouteRouteWithChildren
   '/explorer/$collectionId/': typeof ExplorerCollectionIdIndexRoute
+  '/explorer/$collectionId/$itemId/label': typeof ExplorerCollectionIdItemIdLabelRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/component-example': typeof ComponentExampleRoute
   '/explorer': typeof ExplorerIndexRoute
-  '/explorer/$collectionId/$itemId': typeof ExplorerCollectionIdItemIdRoute
+  '/explorer/$collectionId/$itemId': typeof ExplorerCollectionIdItemIdRouteRouteWithChildren
   '/explorer/$collectionId': typeof ExplorerCollectionIdIndexRoute
+  '/explorer/$collectionId/$itemId/label': typeof ExplorerCollectionIdItemIdLabelRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -79,8 +88,9 @@ export interface FileRoutesById {
   '/component-example': typeof ComponentExampleRoute
   '/explorer/$collectionId': typeof ExplorerCollectionIdRouteRouteWithChildren
   '/explorer/': typeof ExplorerIndexRoute
-  '/explorer/$collectionId/$itemId': typeof ExplorerCollectionIdItemIdRoute
+  '/explorer/$collectionId/$itemId': typeof ExplorerCollectionIdItemIdRouteRouteWithChildren
   '/explorer/$collectionId/': typeof ExplorerCollectionIdIndexRoute
+  '/explorer/$collectionId/$itemId/label': typeof ExplorerCollectionIdItemIdLabelRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -92,6 +102,7 @@ export interface FileRouteTypes {
     | '/explorer/'
     | '/explorer/$collectionId/$itemId'
     | '/explorer/$collectionId/'
+    | '/explorer/$collectionId/$itemId/label'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -99,6 +110,7 @@ export interface FileRouteTypes {
     | '/explorer'
     | '/explorer/$collectionId/$itemId'
     | '/explorer/$collectionId'
+    | '/explorer/$collectionId/$itemId/label'
   id:
     | '__root__'
     | '/'
@@ -108,6 +120,7 @@ export interface FileRouteTypes {
     | '/explorer/'
     | '/explorer/$collectionId/$itemId'
     | '/explorer/$collectionId/'
+    | '/explorer/$collectionId/$itemId/label'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -164,20 +177,42 @@ declare module '@tanstack/react-router' {
       id: '/explorer/$collectionId/$itemId'
       path: '/$itemId'
       fullPath: '/explorer/$collectionId/$itemId'
-      preLoaderRoute: typeof ExplorerCollectionIdItemIdRouteImport
+      preLoaderRoute: typeof ExplorerCollectionIdItemIdRouteRouteImport
       parentRoute: typeof ExplorerCollectionIdRouteRoute
+    }
+    '/explorer/$collectionId/$itemId/label': {
+      id: '/explorer/$collectionId/$itemId/label'
+      path: '/label'
+      fullPath: '/explorer/$collectionId/$itemId/label'
+      preLoaderRoute: typeof ExplorerCollectionIdItemIdLabelRouteImport
+      parentRoute: typeof ExplorerCollectionIdItemIdRouteRoute
     }
   }
 }
 
+interface ExplorerCollectionIdItemIdRouteRouteChildren {
+  ExplorerCollectionIdItemIdLabelRoute: typeof ExplorerCollectionIdItemIdLabelRoute
+}
+
+const ExplorerCollectionIdItemIdRouteRouteChildren: ExplorerCollectionIdItemIdRouteRouteChildren =
+  {
+    ExplorerCollectionIdItemIdLabelRoute: ExplorerCollectionIdItemIdLabelRoute,
+  }
+
+const ExplorerCollectionIdItemIdRouteRouteWithChildren =
+  ExplorerCollectionIdItemIdRouteRoute._addFileChildren(
+    ExplorerCollectionIdItemIdRouteRouteChildren,
+  )
+
 interface ExplorerCollectionIdRouteRouteChildren {
-  ExplorerCollectionIdItemIdRoute: typeof ExplorerCollectionIdItemIdRoute
+  ExplorerCollectionIdItemIdRouteRoute: typeof ExplorerCollectionIdItemIdRouteRouteWithChildren
   ExplorerCollectionIdIndexRoute: typeof ExplorerCollectionIdIndexRoute
 }
 
 const ExplorerCollectionIdRouteRouteChildren: ExplorerCollectionIdRouteRouteChildren =
   {
-    ExplorerCollectionIdItemIdRoute: ExplorerCollectionIdItemIdRoute,
+    ExplorerCollectionIdItemIdRouteRoute:
+      ExplorerCollectionIdItemIdRouteRouteWithChildren,
     ExplorerCollectionIdIndexRoute: ExplorerCollectionIdIndexRoute,
   }
 

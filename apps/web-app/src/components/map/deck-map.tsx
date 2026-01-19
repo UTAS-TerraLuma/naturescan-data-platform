@@ -11,13 +11,17 @@ export function DeckMap() {
     const layers = useDeckLayers((s) => s.layers)
 
     return (
-        <DeckGL
-            viewState={viewState}
-            onViewStateChange={({ viewState }) => updateViewState(viewState)}
-            controller
-            layers={layers}
-        >
-            <Map mapStyle="https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json" />
-        </DeckGL>
+        <div onContextMenu={(e) => e.preventDefault()}>
+            <DeckGL
+                viewState={viewState}
+                onViewStateChange={({ viewState }) =>
+                    updateViewState(viewState)
+                }
+                controller
+                layers={layers}
+            >
+                <Map mapStyle="https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json" />
+            </DeckGL>
+        </div>
     )
 }

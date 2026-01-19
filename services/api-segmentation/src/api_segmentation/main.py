@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import cast
-
+import torch
 import numpy as np
 import rasterio
 import supervision as sv
@@ -18,22 +18,24 @@ from shapely import MultiPolygon, Polygon
 from shapely.affinity import affine_transform, translate
 from shapely.geometry import mapping
 from shapely.ops import transform as shapely_transform
-from ultralytics.models.fastsam import FastSAM
+from ultralytics.models.sam import SAM
+
+# FAST_SAM_MODEL = "FastSAM-s.pt"
+SAM3_MODEL = "sam3.pt"
 
 
 # Model will be stored here after loading
 class AppState:
-    model: FastSAM | None = None
+    model: SAM | None = None
 
 
 app_state = AppState()
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Load the model on startup and clean up on shutdown."""
     # Startup: Load the FastSAM model
-    model_path = Path(__file__).parent.parent.parent / "models" / "FastSAM-s.pt"
+    model_path = Path(__file__).parent.parent.parent / "models" / SAM3_MODEL
 
     if not model_path.exists():
         print(f"WARNING: Model file not found at {model_path}")
@@ -41,7 +43,7 @@ async def lifespan(app: FastAPI):
         app_state.model = None
     else:
         print(f"Loading FastSAM model from {model_path}...")
-        app_state.model = FastSAM(str(model_path))
+        app_state.model = SAM(str(model_path))
         print("Model loaded successfully!")
 
     yield
@@ -113,7 +115,7 @@ def predict(payload: SegmentRequest):
             return (x[0], y[0])
 
         # Size of the image to extract from the orthomosaic
-        img_pixel_size = 640
+        img_pixel_size = 1004
 
         with rasterio.open(payload.url, mode="r") as src:
             src = cast(DatasetReader, src)
@@ -197,6 +199,17 @@ def predict(payload: SegmentRequest):
             detail=f"Segmentation failed: {str(e)}",
         )
 
+
+@app.get("/debug/gpu-info")
+def gpu_info():
+    """Check GPU availability and model device placement."""
+    return {
+        "cuda_available": torch.cuda.is_available(),
+        "cuda_device_count": torch.cuda.device_count(),
+        "cuda_current_device": torch.cuda.current_device() if torch.cuda.is_available() else None,
+        "cuda_device_name": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
+        "model_device": str(next(app_state.model.model.parameters()).device) if app_state.model else "No model loaded",
+    }
 
 @app.get("/health")
 def health():
