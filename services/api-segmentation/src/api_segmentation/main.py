@@ -33,7 +33,7 @@ app_state = AppState()
 async def lifespan(app: FastAPI):
     """Load the model on startup and clean up on shutdown."""
     # Startup: Load the FastSAM model
-    model_path = Path(__file__).parent.parent / "models" / "FastSAM-s.pt"
+    model_path = Path(__file__).parent.parent.parent / "models" / "FastSAM-s.pt"
 
     if not model_path.exists():
         print(f"WARNING: Model file not found at {model_path}")

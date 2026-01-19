@@ -1,6 +1,7 @@
 from pathlib import Path
 from ns_types import AssetConfig
 from osgeo import gdal
+import pyproj
 
 gdal.UseExceptions()
 
@@ -51,6 +52,7 @@ def create_cog(input: Path, output: Path, config: AssetConfig, force=False) -> N
     :raises AssertionError: If input file is not a .tif, not a GeoTIFF, has incorrect bands, or mismatched data type/nodata.
     :raises RuntimeError: GDAL will raise a runtime error if it encounters an error while processing the COG.
     """
+
     # If output already exists skip (unless force is True)
     if output.exists() and not force:
         print(f"Skipping {input.name} as {output.name} already exists.")

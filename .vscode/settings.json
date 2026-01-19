@@ -1,7 +1,0 @@
-{
-    "python.defaultInterpreterPath": "${workspaceFolder}/.pixi/envs/notebooks/bin/python",
-    "jupyter.notebookFileRoot": "${workspaceFolder}/notebooks",
-    "jupyter.interactiveWindow.creationMode": "perFile",
-    "python-envs.defaultEnvManager": "ms-python.python:system",
-    "python-envs.pythonProjects": []
-}

@@ -1,0 +1,27 @@
+[project]
+authors = [{name = "James Gregory", email = "james.gregory@utas.edu.au"}]
+dependencies = []
+name = "cog-stac"
+requires-python = ">= 3.11"
+version = "0.1.0"
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+[tool.pixi.pypi-dependencies]
+cog_stac = { path = ".", editable = true }
+
+[tool.pixi.tasks]
+
+[tool.pixi.dependencies]
+gdal = ">=3.12.1,<4"
+pydantic = ">=2.12.5,<3"
+pystac = ">=1.14.3,<2"
+ipykernel = ">=7.1.0,<8"
+jupyterlab = ">=4.5.2,<5"
+pyproj = ">=3.7.2,<4"

@@ -5,8 +5,8 @@ Welcome to your new TanStack app!
 To run this application:
 
 ```bash
-bun install
-bun --bun run start
+pnpm install
+pnpm run start
 ```
 
 # Building For Production
@@ -14,7 +14,7 @@ bun --bun run start
 To build this application for production:
 
 ```bash
-bun --bun run build
+pnpm run build
 ```
 
 ## Testing
@@ -22,7 +22,7 @@ bun --bun run build
 This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:
 
 ```bash
-bun --bun run test
+pnpm run test
 ```
 
 ## Styling

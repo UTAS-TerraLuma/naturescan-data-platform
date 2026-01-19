@@ -1,0 +1,24 @@
+[project]
+authors = [{ name = "James Gregory", email = "james.gregory@utas.edu.au" }]
+dependencies = ["titiler-application>=1.1.0,<2"]
+name = "api-titiler"
+requires-python = ">= 3.11"
+version = "0.1.0"
+
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+
+[tool.pixi.tasks.dev]
+cmd = "uvicorn titiler.application.main:app --reload --port {{ port }}"
+
+[[tool.pixi.tasks.dev.args]]
+arg = "port"
+default = "8001"
+
+[tool.pixi.dependencies]
+gdal = ">=3.12.1,<4"
+rasterio = ">=1.5.0,<2"
+uvicorn = ">=0.40.0,<0.41"

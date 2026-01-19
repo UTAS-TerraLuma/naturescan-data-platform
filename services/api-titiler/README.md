@@ -1,6 +1,22 @@
 # API: TiTiler
 
-- TiTiler API
-- Using default application
-- Environment variables for config set in [titiler_env_vars.sh](./titiler_env_vars.sh)
-- TiTiler itself is not coupled to NatureScan / STAC. The COG being used is passed as a parameter in the API call.
+We are using the default TiTiler application.
+
+## Usage
+
+Install dependencies:
+```bash
+pixi install
+```
+
+Start the dev server with default collections:
+```bash
+pixi run dev
+```
+
+Or specify a custom collections file:
+```bash
+pixi run dev
+```
+
+The API will be available at `http://127.0.0.1:8001`.

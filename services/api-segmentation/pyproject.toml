@@ -1,0 +1,36 @@
+[project]
+authors = [{ name = "James Gregory", email = "james.gregory@utas.edu.au" }]
+dependencies = ["torch>=2.9.1,<3", "torchvision>=0.24.1,<0.25"]
+name = "api-segmentation"
+requires-python = ">= 3.11"
+version = "0.1.0"
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+[tool.pixi.pypi-dependencies]
+api_segmentation = { path = ".", editable = true }
+
+[tool.pixi.tasks.dev]
+cmd = "uvicorn api_segmentation.main:app --reload --port {{ port }}"
+
+[[tool.pixi.tasks.dev.args]]
+arg = "port"
+default = "8003"
+
+[tool.pixi.dependencies]
+numpy = ">=2.4.1,<3"
+gdal = ">=3.12.1,<4"
+rasterio = ">=1.5.0,<2"
+shapely = ">=2.1.2,<3"
+ultralytics = ">=8.4.5,<9"
+supervision = ">=0.25.1,<0.26"
+pyproj = ">=3.7.2,<4"
+proj = ">=9.7.1,<10"
+fastapi = ">=0.128.0,<0.129"
+pydantic = ">=2.12.5,<3"

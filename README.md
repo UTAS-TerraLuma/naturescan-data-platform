@@ -14,20 +14,9 @@ split into:
 
 ## Requirements
 
-Environments for this repo are managed by [Pixi](https://pixi.sh). Follow the [install instructions](https://pixi.sh/v0.62.0/installation/) to install pixi. Pixi will then be able to install remaining requirements.
+Each sub-app handles its own dependencies. You will need:
+- `pnpm` for javascript apps
+- `pixp` for python services
+- `docker` for select services
 
-## Dev Usages
-
-Run `pixi task list` to get a list of available tasks. Then run using `pixi run`. E.g. `pixi run dev-api-titiler`.
-
-### Notebook Usage
-
-A Jupyter notebook server can be ran using `pixi run dev-notebooks`. This will automatically install the notebooks environment.
-Alternatively, if using VSCode, you should be able to select the Kernel directly from `.pixi/envs/notebooks` after the environment has
-been installed (either automatically from above or via `pixi install -e notebooks`).
-
-TODO - Add marimo as an option
-
-## Deployment
-
-TODO. Ideally using docker ?
+## Dev Servers
