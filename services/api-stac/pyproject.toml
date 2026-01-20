@@ -10,15 +10,15 @@ channels = ["conda-forge"]
 platforms = ["linux-64"]
 
 [tool.pixi.tasks.dev]
-cmd = "STAC_FASTAPI_COLLECTIONS_HREF='{{ collections_href }}' uvicorn stac_fastapi.geoparquet.main:app --port {{ port }}"
-
-[[tool.pixi.tasks.dev.args]]
-arg = "collections_href"
-default = "/home/jamesg/test_data/naturescan/stac/collections.json"
+cmd = "STAC_FASTAPI_COLLECTIONS_HREF='{{ collections_href }}' uvicorn stac_fastapi.geoparquet.main:app --host 0.0.0.0 --port {{ port }}"
 
 [[tool.pixi.tasks.dev.args]]
 arg = "port"
 default = "8002"
+
+[[tool.pixi.tasks.dev.args]]
+arg = "collections_href"
+default = "/home/jamesg/test_data/naturescan/stac/collections.json"
 
 [tool.pixi.dependencies]
 uvicorn = ">=0.40.0,<0.41"

@@ -3,58 +3,48 @@
 version: "3"
 
 vars:
-  ASSETS_PATH: /home/jamesg/test_data/naturescan/
-  COLLECTIONS_PATH: /home/jamesg/test_data/naturescan/stac/collections.json
-  # Ports
-  WEB_APP_PORT: 8000
-  API_TITILER_PORT: 8001
-  API_STAC_PORT: 8002
-  API_SEGMENTATION_PORT: 8003
-  ASSETS_PORT: 8010
+    ASSETS_PATH: /home/jamesg/test_data/naturescan/
+    COLLECTIONS_PATH: /home/jamesg/test_data/naturescan/stac/collections.json
+    # Ports
+    WEB_APP_PORT: 8000
+    API_TITILER_PORT: 8001
+    API_STAC_PORT: 8002
+    API_SEGMENTATION_PORT: 8003
+    ASSETS_PORT: 8010
 
 tasks:
-  # Local Asset Server
-  asset-server:
-    desc: Serve assets on http
-    cmds:
-      - pnpm dlx http-server {{.ASSETS_PATH}} --port {{.ASSETS_PORT}} --cors
+    # Local Asset Server
+    asset-server:
+        desc: Serve assets on http
+        cmds:
+            - pnpm dlx http-server {{.ASSETS_PATH}} --port {{.ASSETS_PORT}} --cors
 
-  # TiTiler API Server
-  api-titiler:
-    desc: Start the TiTiler API server
-    dir: services/api-titiler
-    cmds:
-      - pixi run dev {{.API_TITILER_PORT}}
+    # TiTiler API Server
+    api-titiler:
+        desc: Start the TiTiler API server
+        dir: services/api-titiler
+        cmds:
+            - pixi run dev {{.API_TITILER_PORT}}
 
-  # STAC API
-  api-stac:
-    desc: Start the STAC API server
-    dir: services/api-stac
-    cmds:
-      - pixi run dev {{.COLLECTIONS_PATH}} {{.API_STAC_PORT}}
-    env:
-      STAC_FASTAPI_COLLECTIONS_HREF: "{{.COLLECTIONS_PATH }}"
+    # STAC API
+    api-stac:
+        desc: Start the STAC API server
+        dir: services/api-stac
+        cmds:
+            - pixi run dev {{.API_STAC_PORT}} {{.COLLECTIONS_PATH}}
+        env:
+            STAC_FASTAPI_COLLECTIONS_HREF: "{{.COLLECTIONS_PATH }}"
 
-  # Segmentaion API
-  api-segmentation:
-    desc: Start the segmentation API
-    dir: services/api-segmentation
-    cmds:
-      - pixi run dev {{.API_SEGMENTATION_PORT}}
+    # Segmentaion API
+    api-segmentation:
+        desc: Start the segmentation API
+        dir: services/api-segmentation
+        cmds:
+            - pixi run dev {{.API_SEGMENTATION_PORT}}
 
-  # Web App
-  web-app:
-    desc: Start the web app dev server
-    dir: apps/web-app
-    cmds:
-      - pnpm run dev
-
-  dev-all:
-    desc: Start all services for local development
-    deps:
-      - asset-server
-      - api-titiler
-      - api-stac
-      - api-segmentation
-      - web-app
-    failfast: true
+    # Web App
+    web-app:
+        desc: Start the web app dev server
+        dir: apps/web-app
+        cmds:
+            - pnpm run dev
