@@ -1,6 +1,6 @@
 import type { Point2D } from "@/types/spatial"
 
-const API_URL = "http://localhost:8003"
+const API_URL = import.meta.env.VITE_SEGMENTATION_API
 
 export async function predictSegment(point: Point2D, url: string) {
     const body = {

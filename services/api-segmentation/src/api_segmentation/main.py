@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import os
 from pathlib import Path
 from typing import cast
 import torch
@@ -20,8 +21,8 @@ from shapely.geometry import mapping
 from shapely.ops import transform as shapely_transform
 from ultralytics.models.sam import SAM
 
-# FAST_SAM_MODEL = "FastSAM-s.pt"
-SAM3_MODEL = "sam3.pt"
+DEFAULT_MODEL_PATH = Path("/home/jamesg/models/sam3.pt")
+MODEL_PATH = Path(os.environ.get("MODEL_PATH", DEFAULT_MODEL_PATH))
 
 
 # Model will be stored here after loading
@@ -35,15 +36,13 @@ app_state = AppState()
 async def lifespan(app: FastAPI):
     """Load the model on startup and clean up on shutdown."""
     # Startup: Load the FastSAM model
-    model_path = Path(__file__).parent.parent.parent / "models" / SAM3_MODEL
-
-    if not model_path.exists():
-        print(f"WARNING: Model file not found at {model_path}")
-        print("Please place FastSAM-s.pt in the api/models/ directory")
+    if not MODEL_PATH.exists():
+        print(f"WARNING: Model file not found at {MODEL_PATH}")
+        print("Set MODEL_PATH or place the model under services/api-segmentation/models/")
         app_state.model = None
     else:
-        print(f"Loading FastSAM model from {model_path}...")
-        app_state.model = SAM(str(model_path))
+        print(f"Loading FastSAM model from {MODEL_PATH}...")
+        app_state.model = SAM(str(MODEL_PATH))
         print("Model loaded successfully!")
 
     yield
@@ -97,7 +96,7 @@ def predict(payload: SegmentRequest):
     if model is None:
         raise HTTPException(
             status_code=503,
-            detail="Model not loaded. Please ensure FastSAM-s.pt is in the api/models/ directory",
+            detail="Model not loaded. Set MODEL_PATH or place the model under services/api-segmentation/models/",
         )
 
     try:

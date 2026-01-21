@@ -9,7 +9,7 @@ import {
 import { queryOptions } from "@tanstack/react-query"
 import { queryClient } from "./tanstack-query-client"
 
-const STAC_API_URL = "http://localhost:8002"
+const STAC_API_URL = import.meta.env.VITE_STAC_API
 
 const COLLECTIONS = "collections"
 const ITEMS = "items"
@@ -17,6 +17,7 @@ const ITEMS = "items"
 // ---- COLLECTIONS ----
 
 async function fetchCollections() {
+    console.log(`${STAC_API_URL}/collections`)
     const response = await fetch(`${STAC_API_URL}/collections`)
     const data = await response.json()
 

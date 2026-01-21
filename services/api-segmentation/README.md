@@ -8,12 +8,12 @@ Image segmentation API using FastSAM for automated object detection in geospatia
 pixi install
 ```
 
-Download the FastSAM model and place it in `models/FastSAM-s.pt`.
+Download the FastSAM model and place it in `models/sam3.pt`, or set `MODEL_PATH` to the model file.
 
 ## Development
 
 ```bash
-pixi run dev
+MODEL_PATH=/path/to/model.pt pixi run dev
 ```
 
 The API runs on http://localhost:8003

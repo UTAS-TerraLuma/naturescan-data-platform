@@ -1,13 +1,12 @@
-FROM ghcr.io/prefix-dev/pixi:latest
+FROM ghcr.io/prefix-dev/pixi:noble
 
 WORKDIR /app
 
-COPY pyproject.toml /app/pyproject.toml
-
+COPY pyproject.toml pixi.lock /app/
 # In the future should make this configurable?
 COPY collections.json /app/collections.json
 
-RUN pixi install
+RUN pixi install --locked && rm -rf ~/.cache/rattler
 
 
 EXPOSE 8002

@@ -1,7 +1,7 @@
 import type { Bounds } from "@/types/spatial"
 import * as z from "zod"
 
-const TITILER_URL = "http://localhost:8001"
+const TITILER_URL = import.meta.env.VITE_TILES_API
 const XYZ_TILES_ROUTE = "/cog/tiles/WebMercatorQuad/{z}/{x}/{y}@2x.png"
 
 export function getRgbXyzUrl(cogUrl: string) {

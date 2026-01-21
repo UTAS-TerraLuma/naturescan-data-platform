@@ -19,9 +19,18 @@ tasks:
         cmds:
             - pnpm dlx http-server {{.ASSETS_PATH}} --port {{.ASSETS_PORT}} --cors
 
-    # TiTiler API Server
+    # TiTiler API Server via Docker
     dev:api-titiler:
-        desc: Start the TiTiler API server
+        desc: Start the TiTiler API server via Docker
+        cmds:
+            - docker run -p 8001:8001 ghcr.io/developmentseed/titiler:latest uvicorn titiler.application.main:app --host 0.0.0.0 --port 8001
+
+    # TiTiler API Server via Pixi
+    # This is helpful if assets are being served locally via asset-server
+    # As I couldn't figure out how to get the docker version to work
+    # with it
+    dev:api-titiler-pixi:
+        desc: Start the TiTiler API server via Pixi
         dir: services/api-titiler
         cmds:
             - pixi run dev {{.API_TITILER_PORT}}
@@ -49,9 +58,29 @@ tasks:
         cmds:
             - pnpm run dev
 
+    # Caddy HTTPS reverse proxy
+    dev:caddy:
+        desc: Start Caddy reverse proxy for local HTTPS
+        cmds:
+            - caddy run --config ./Caddyfile
+
     # Build API STAC
     build:api-stac:
         desc: "Build STAC API docker file"
         dir: services/api-stac
         cmds:
             - docker build -t api-stac .
+
+    # Build API Segmentation
+    build:api-segmentation:
+        desc: Build segmentation API docker file
+        dir: services/api-segmentation
+        cmds:
+            - docker build -t api-segmentation .
+
+    # Build the web app
+    build:web-app:
+        desc: Build the web app
+        dir: apps/web-app
+        cmds:
+            - pnpm build

@@ -1,0 +1,13 @@
+http://stac.localhost {
+  reverse_proxy api-stac:8002
+}
+
+http://tiles.localhost {
+  reverse_proxy api-titiler:80
+}
+
+http://app.localhost {
+  root * /srv
+  try_files {path} /index.html
+  file_server
+}
