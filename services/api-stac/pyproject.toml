@@ -18,7 +18,7 @@ default = "8002"
 
 [[tool.pixi.tasks.dev.args]]
 arg = "collections_href"
-default = "/home/jamesg/test_data/naturescan/stac/collections.json"
+default = "./collections.json"
 
 [tool.pixi.dependencies]
 uvicorn = ">=0.40.0,<0.41"

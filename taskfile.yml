@@ -14,20 +14,20 @@ vars:
 
 tasks:
     # Local Asset Server
-    asset-server:
+    dev:asset-server:
         desc: Serve assets on http
         cmds:
             - pnpm dlx http-server {{.ASSETS_PATH}} --port {{.ASSETS_PORT}} --cors
 
     # TiTiler API Server
-    api-titiler:
+    dev:api-titiler:
         desc: Start the TiTiler API server
         dir: services/api-titiler
         cmds:
             - pixi run dev {{.API_TITILER_PORT}}
 
     # STAC API
-    api-stac:
+    dev:api-stac:
         desc: Start the STAC API server
         dir: services/api-stac
         cmds:
@@ -36,15 +36,22 @@ tasks:
             STAC_FASTAPI_COLLECTIONS_HREF: "{{.COLLECTIONS_PATH }}"
 
     # Segmentaion API
-    api-segmentation:
+    dev:api-segmentation:
         desc: Start the segmentation API
         dir: services/api-segmentation
         cmds:
             - pixi run dev {{.API_SEGMENTATION_PORT}}
 
     # Web App
-    web-app:
+    dev:web-app:
         desc: Start the web app dev server
         dir: apps/web-app
         cmds:
             - pnpm run dev
+
+    # Build API STAC
+    build:api-stac:
+        desc: "Build STAC API docker file"
+        dir: services/api-stac
+        cmds:
+            - docker build -t api-stac .

@@ -64,7 +64,7 @@ export const collectionQueryOptions = (collectionId: string) =>
 
 async function fetchCollectionItems(collectionId: string) {
     const respone = await fetch(
-        `${STAC_API_URL}/${COLLECTIONS}/${collectionId}/${ITEMS}`,
+        `${STAC_API_URL}/${COLLECTIONS}/${collectionId}/${ITEMS}?limit=1000`,
     )
 
     const data = await respone.json()

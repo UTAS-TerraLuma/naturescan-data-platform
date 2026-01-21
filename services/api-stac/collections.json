@@ -1,0 +1,98 @@
+[
+  {
+    "type": "Collection",
+    "id": "naturescan-rgb",
+    "stac_version": "1.1.0",
+    "description": "NatureScan RGB Orthomosaics",
+    "links": [],
+    "title": "NatureScan RGB Orthomosaics",
+    "extent": {
+      "spatial": {
+        "bbox": [
+          [
+            133.1660569,
+            -42.568025,
+            148.0103124,
+            -24.5262888
+          ]
+        ]
+      },
+      "temporal": {
+        "interval": [
+          [
+            "2024-08-12T02:00:00Z",
+            "2025-11-20T01:00:00Z"
+          ]
+        ]
+      }
+    },
+    "license": "other",
+    "providers": [
+      {
+        "name": "TerraLuma",
+        "description": "TerraLuma University of Tasmania",
+        "roles": [
+          "host",
+          "licensor",
+          "producer",
+          "processor"
+        ],
+        "url": "https://www.utas.edu.au/research/projects/terraluma"
+      }
+    ],
+    "assets": {
+      "data": {
+        "href": "https://object-store.rc.nectar.org.au/v1/AUTH_4df2f67c2eed48a2aaeeed008a4bf0de/naturescan-assets/stac/naturescan-rgb.parquet",
+        "type": "application/vnd.apache.parquet"
+      }
+    }
+  },
+  {
+    "type": "Collection",
+    "id": "naturescan-ms",
+    "stac_version": "1.1.0",
+    "description": "NatureScan MS Orthomosaics",
+    "links": [],
+    "title": "NatureScan MS Orthomosaics",
+    "extent": {
+      "spatial": {
+        "bbox": [
+          [
+            133.1660569,
+            -42.5678504,
+            148.010128,
+            -24.5262888
+          ]
+        ]
+      },
+      "temporal": {
+        "interval": [
+          [
+            "2024-08-12T02:00:00Z",
+            "2026-01-16T01:00:00Z"
+          ]
+        ]
+      }
+    },
+    "license": "other",
+    "providers": [
+      {
+        "name": "TerraLuma",
+        "description": "TerraLuma University of Tasmania",
+        "roles": [
+          "host",
+          "licensor",
+          "producer",
+          "processor"
+        ],
+        "url": "https://www.utas.edu.au/research/projects/terraluma"
+      }
+    ],
+    "assets": {
+      "data": {
+        "href": "https://object-store.rc.nectar.org.au/v1/AUTH_4df2f67c2eed48a2aaeeed008a4bf0de/naturescan-assets/stac/naturescan-ms.parquet",
+        "type": "application/vnd.apache.parquet"
+      }
+    }
+  }
+]

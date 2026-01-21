@@ -1,5 +1,5 @@
 [project]
-authors = [{name = "James Gregory", email = "james.gregory@utas.edu.au"}]
+authors = [{ name = "James Gregory", email = "james.gregory@utas.edu.au" }]
 dependencies = []
 name = "cog-stac"
 requires-python = ">= 3.11"
@@ -16,6 +16,9 @@ platforms = ["linux-64"]
 [tool.pixi.pypi-dependencies]
 cog_stac = { path = ".", editable = true }
 
+[tool.pixi.activation]
+scripts = ["./openrc.sh"]
+
 [tool.pixi.tasks]
 
 [tool.pixi.dependencies]
@@ -25,3 +28,6 @@ pystac = ">=1.14.3,<2"
 ipykernel = ">=7.1.0,<8"
 jupyterlab = ">=4.5.2,<5"
 pyproj = ">=3.7.2,<4"
+python-openstackclient = ">=8.3.0,<9"
+rustac = ">=0.9.3,<0.10"
+python-swiftclient = ">=4.9.0,<5"
