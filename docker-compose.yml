@@ -1,19 +1,25 @@
-version: "3.9"
-
 services:
   caddy:
-    image: caddy:2
+    image: caddy:latest
+    # Open ports required for web traffic and HTTPS
     ports:
       - "80:80"
       - "443:443"
     volumes:
+      # Copy over caddy file (read only)
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./apps/web-app/dist:/srv:ro
-      - caddy_data:/data
-      - caddy_config:/config
+      # Copy over web app files (read only)
+      # - ./apps/web-app/dist:/srv:ro
+      # Not sure about these
+      # - caddy_data:/data
+      # - caddy_config:/config
     depends_on:
       - api-stac
       - api-titiler
+      - web-app
+
+  web-app:
+    image: web-app
 
   api-stac:
     image: api-stac

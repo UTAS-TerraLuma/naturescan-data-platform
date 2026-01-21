@@ -1,0 +1,21 @@
+# deps
+node_modules
+.pnpm-store
+
+# build output (Docker produces its own)
+dist
+
+# VCS
+.git
+.gitignore
+
+# editor / OS junk
+.DS_Store
+.vscode
+.zed
+
+.tanstack
+
+# logs
+npm-debug.log*
+pnpm-debug.log*

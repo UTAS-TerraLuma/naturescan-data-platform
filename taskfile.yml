@@ -70,6 +70,7 @@ tasks:
         dir: services/api-stac
         cmds:
             - docker build -t api-stac .
+            - docker image tag api-stac jmswsc/api-stac
 
     # Build API Segmentation
     build:api-segmentation:
@@ -77,10 +78,12 @@ tasks:
         dir: services/api-segmentation
         cmds:
             - docker build -t api-segmentation .
+            - docker image tag api-segmentation jmswsc/api-segmentation
 
     # Build the web app
     build:web-app:
         desc: Build the web app
         dir: apps/web-app
         cmds:
-            - pnpm build
+            - docker build -t web-app .
+            - docker image tag web-app jmswsc/web-app
