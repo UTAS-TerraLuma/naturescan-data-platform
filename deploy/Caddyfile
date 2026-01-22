@@ -1,11 +1,11 @@
-http://stac.localhost {
+stac.tern-dronescape.cloud.edu.au {
   reverse_proxy api-stac:8002
 }
 
-http://tiles.localhost {
+tiles.tern-dronescape.cloud.edu.au {
   reverse_proxy api-titiler
 }
 
-http://app.localhost {
+tern-dronescape.cloud.edu.au {
   reverse_proxy web-app
 }
