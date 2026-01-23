@@ -75,6 +75,8 @@ async def segment(request: SegmentRequest):
     Returns:
         polygons: List of polygons representing the segmentation masks
     """
+    print("TRYING TO SEGMENT")
+
     if model is None:
         raise HTTPException(status_code=503, detail="Model not loaded")
 
@@ -84,16 +86,19 @@ async def segment(request: SegmentRequest):
         )
 
     try:
+        print(f"TRYING TO GET IMAGE FROM {request.url}")
         # Download image into memory
         async with httpx.AsyncClient() as client:
             response = await client.get(str(request.url))
             response.raise_for_status()
             image = Image.open(BytesIO(response.content))
 
+        print("IMAGE GOTTEN SUCCESFULLY")
         # Run prediction with PIL.Image object
         results = model.predict(
             image, points=request.points, labels=request.labels, imgsz=[1036]
         )
+        print("PREDICTION DONE")
 
         # Convert to detections
         detections = Detections.from_ultralytics(results[0])
@@ -121,6 +126,7 @@ async def segment(request: SegmentRequest):
         return SegmentResponse(polygons=polygons)
 
     except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail=f"Segmentation failed: {str(e)}")
 
 

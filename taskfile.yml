@@ -80,6 +80,7 @@ tasks:
         cmds:
             - docker build -t api-segmentation .
             - docker image tag api-segmentation jmswsc/api-segmentation
+            - docker push jmswsc/api-segmentation
 
     # Build the web app
     build:web-app:
