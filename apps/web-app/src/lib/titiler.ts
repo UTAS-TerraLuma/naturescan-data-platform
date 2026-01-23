@@ -37,7 +37,7 @@ export async function getCogBoundsWGS84(cogUrl: string): Promise<Bounds> {
 
 type SearchParams = Record<string, string | number | Array<string | number>>
 
-function createTitilerUrl(
+export function createTitilerUrl(
     apiRoute: string,
     searchParams: SearchParams = {},
 ): string {

@@ -6,6 +6,10 @@ import { useCallback, useEffect, useState } from "react"
 import { GeoJsonLayer, PolygonLayer, ScatterplotLayer } from "@deck.gl/layers"
 import { Button } from "@/components/ui/button"
 import { predictSegment } from "@/lib/segment"
+import type { Point2D } from "@/types/spatial"
+import { useMapViewState } from "@/stores/map-view-state-store"
+import { WebMercatorViewport } from "@deck.gl/core"
+import { createTitilerUrl } from "@/lib/titiler"
 
 export const Route = createFileRoute("/explorer/$collectionId/$itemId/label")({
     component: RouteComponent,
@@ -20,9 +24,7 @@ function RouteComponent() {
     const updateLayer = useDeckLayers((s) => s.updateLayer)
     const removeLayer = useDeckLayers((s) => s.removeLayer)
 
-    const [predictPoint, setPredictPoint] = useState<[number, number] | null>(
-        null,
-    )
+    const [predictPoint, setPredictPoint] = useState<Point2D | null>(null)
 
     const [segments, setSegments] = useState<any[]>([])
 
@@ -33,8 +35,6 @@ function RouteComponent() {
 
     useEffect(() => {
         const id = "predict-point"
-
-        console.log(predictPoint)
 
         const layer = new ScatterplotLayer({
             id,
@@ -126,22 +126,81 @@ function RouteComponent() {
         }
     }, [segments, updateLayer, removeLayer])
 
+    // async function onPredict(point: Point2D) {
+    //     const segment = await predictSegment(point, item.assets.main.href)
+    //     updateSegments(segment)
+    //     setPredictPoint(null)
+    // }
+
+    async function onPredict(pointLngLat: Point2D) {
+        const { viewState, canvasSize } = useMapViewState.getState()
+        const { width, height } = canvasSize
+
+        // TODO - Force pitch to be 0 ?
+        const { latitude, longitude, zoom, pitch, bearing } = viewState
+        const predictionViewport = new WebMercatorViewport({
+            longitude,
+            latitude,
+            zoom,
+            width,
+            height,
+            pitch,
+            bearing,
+        })
+
+        const [minLng, maxLat] = predictionViewport.unproject([0, 0])
+        const [maxLng, minLat] = predictionViewport.unproject([width, height])
+
+        const imageUrl = createTitilerUrl(
+            `/cog/bbox/${minLng},${minLat},${maxLng},${maxLat}/${width}x${height}.png`,
+            {
+                url: item.assets.main.href,
+            },
+        )
+
+        const pointXY = predictionViewport.project(pointLngLat) as Point2D
+
+        const { polygons: polygonsXY } = await predictSegment(pointXY, imageUrl)
+
+        if (polygonsXY.length == 0) {
+            console.warn("No predictions found")
+            return
+        }
+
+        const polygonsLngLat = polygonsXY.map((polygonXY) =>
+            polygonXY.map((ringXY) =>
+                ringXY.map(
+                    (pointXY) =>
+                        predictionViewport.unproject(pointXY) as [
+                            number,
+                            number,
+                        ],
+                ),
+            ),
+        )
+
+        const properties = { imageUrl: imageUrl, point: pointLngLat }
+
+        const feature = {
+            type: "Feature",
+            properties,
+            geometry: {
+                type: "MultiPolygon",
+                coordinates: polygonsLngLat,
+            },
+        }
+
+        console.log(feature)
+
+        updateSegments(feature)
+        setPredictPoint(null)
+    }
+
     return (
         <div className="px-4 space-y-2">
             <p>Click on the map to add a point</p>
             {predictPoint && (
-                <Button
-                    onClick={async () => {
-                        const segment = await predictSegment(
-                            predictPoint,
-                            item.assets.main.href,
-                        )
-                        updateSegments(segment)
-                        setPredictPoint(null)
-                    }}
-                >
-                    Predict
-                </Button>
+                <Button onClick={() => onPredict(predictPoint)}>Predict</Button>
             )}
         </div>
     )

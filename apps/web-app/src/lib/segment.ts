@@ -1,4 +1,5 @@
 import type { Point2D } from "@/types/spatial"
+import * as z from "zod"
 
 const API_URL = import.meta.env.VITE_SEGMENTATION_API
 
@@ -19,7 +20,14 @@ export async function predictSegment(point: Point2D, url: string) {
 
     const data = await response.json()
 
-    console.log(data)
+    // A ring is an array of points (in this case 2D)
+    const ringSchema = z.array(z.tuple([z.number(), z.number()]))
+    // Polygon is an array of rings
+    const polygonSchema = z.array(ringSchema)
+    // Response returns an array of polygons
+    const responseSchema = z.object({
+        polygons: z.array(polygonSchema),
+    })
 
-    return data
+    return responseSchema.parse(data)
 }

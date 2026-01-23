@@ -23,7 +23,7 @@ tasks:
     dev:api-titiler:
         desc: Start the TiTiler API server via Docker
         cmds:
-            - docker run -p 8001:8001 ghcr.io/developmentseed/titiler:latest uvicorn titiler.application.main:app --host 0.0.0.0 --port 8001
+            - docker run --rm -p 8001:8001 ghcr.io/developmentseed/titiler:latest uvicorn titiler.application.main:app --host 0.0.0.0 --port 8001
 
     # TiTiler API Server via Pixi
     # This is helpful if assets are being served locally via asset-server

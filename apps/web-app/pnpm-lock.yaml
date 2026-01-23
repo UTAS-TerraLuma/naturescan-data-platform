@@ -53,6 +53,9 @@ importers:
       '@tanstack/router-plugin':
         specifier: ^1.132.0
         version: 1.141.7(@tanstack/react-router@1.141.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(vite@8.0.0-beta.0(@types/node@22.19.3)(jiti@2.6.1)(tsx@4.21.0))
+      '@turf/helpers':
+        specifier: ^7.3.2
+        version: 7.3.2
       '@types/react-map-gl':
         specifier: ^6.1.7
         version: 6.1.7
@@ -1621,6 +1624,9 @@ packages:
 
   '@turf/helpers@5.1.5':
     resolution: {integrity: sha512-/lF+JR+qNDHZ8bF9d+Cp58nxtZWJ3sqFe6n3u3Vpj+/0cqkjk4nXKYBSY0azm+GIYB5mWKxUXvuP/m0ZnKj1bw==}
+
+  '@turf/helpers@7.3.2':
+    resolution: {integrity: sha512-5HFN42rgWjSobdTMxbuq+ZdXPcqp1IbMgFYULTLCplEQM3dXhsyRFe7DCss4Eiw12iW3q6Z5UeTNVfITsE5lgA==}
 
   '@turf/invariant@5.2.0':
     resolution: {integrity: sha512-28RCBGvCYsajVkw2EydpzLdcYyhSA77LovuOvgCJplJWaNVyJYH6BOR3HR9w50MEkPqb/Vc/jdo6I6ermlRtQA==}
@@ -5378,6 +5384,11 @@ snapshots:
       '@turf/helpers': 5.1.5
 
   '@turf/helpers@5.1.5': {}
+
+  '@turf/helpers@7.3.2':
+    dependencies:
+      '@types/geojson': 7946.0.16
+      tslib: 2.8.1
 
   '@turf/invariant@5.2.0':
     dependencies:

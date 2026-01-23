@@ -7,6 +7,7 @@ import { useDeckLayers } from "@/stores/deck-layer-store"
 export function DeckMap() {
     const viewState = useMapViewState((s) => s.viewState)
     const updateViewState = useMapViewState((s) => s.updateViewState)
+    const setCanvasSize = useMapViewState((s) => s.setCanvasSize)
 
     const layers = useDeckLayers((s) => s.layers)
 
@@ -19,6 +20,7 @@ export function DeckMap() {
                 }
                 controller
                 layers={layers}
+                onResize={(size) => setCanvasSize(size)}
             >
                 <Map mapStyle="https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json" />
             </DeckGL>

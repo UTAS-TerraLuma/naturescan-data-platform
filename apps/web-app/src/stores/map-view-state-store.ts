@@ -3,13 +3,20 @@ import { WebMercatorViewport, type MapViewState } from "@deck.gl/core"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
+type Size = { width: number; height: number }
+
 interface MapViewStateStore {
     // It's not included in the types but deck
     // passes width and height as part of viewState
-    viewState: MapViewState & { width?: number; height?: number }
+    viewState: MapViewState & Partial<Size>
     updateViewState: (vs: Partial<MapViewState>) => void
     fitBounds: (bounds: Bounds) => void
+    // Explicit handlers for the canvas size
+    canvasSize: Size
+    setCanvasSize: (size: Size) => void
 }
+
+const MAX_ZOOM = 26
 
 export const useMapViewState = create<MapViewStateStore>()(
     persist(
@@ -20,14 +27,14 @@ export const useMapViewState = create<MapViewStateStore>()(
                 zoom: 7.5,
 
                 // Increase default maxZoom
-                maxZoom: 24,
+                maxZoom: MAX_ZOOM,
             },
             updateViewState: (newViewState) =>
                 set((state) => ({
                     viewState: {
                         ...state.viewState,
                         ...newViewState,
-                        maxZoom: 24,
+                        maxZoom: MAX_ZOOM,
                     },
                 })),
             fitBounds: (bounds: Bounds) => {
@@ -55,6 +62,8 @@ export const useMapViewState = create<MapViewStateStore>()(
 
                 updateViewState({ longitude, latitude, zoom })
             },
+            canvasSize: { width: 0, height: 0 },
+            setCanvasSize: (size) => void set({ canvasSize: size }),
         }),
         { name: "map-view-state" },
     ),
