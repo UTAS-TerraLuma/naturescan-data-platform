@@ -42,14 +42,14 @@ tasks:
         cmds:
             - pixi run dev {{.API_STAC_PORT}} {{.COLLECTIONS_PATH}}
         env:
-            STAC_FASTAPI_COLLECTIONS_HREF: "{{.COLLECTIONS_PATH }}"
+            STAC_FASTAPI_COLLECTIONS_HREF: "{{.COLLECTIONS_PATH}}"
 
     # Segmentaion API
     dev:api-segmentation:
         desc: Start the segmentation API
         dir: services/api-segmentation
         cmds:
-            - pixi run dev {{.API_SEGMENTATION_PORT}}
+            - uv run uvicorn main:app --host 0.0.0.0 --port {{.API_SEGMENTATION_PORT}}
 
     # Web App
     dev:web-app:

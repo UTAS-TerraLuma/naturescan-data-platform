@@ -26,7 +26,8 @@ services:
   api-titiler:
     image: ghcr.io/developmentseed/titiler:latest
     environment:
-      - TITILER_API_CORS_ORIGINS=https://tern-dronescape.cloud.edu.au
+      # Not sure how restrict properly without errors
+      - TITILER_API_CORS_ORIGINS=*
       - WEB_CONCURRENCY=6
 
 volumes:

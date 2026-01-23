@@ -1,11 +1,15 @@
-stac.tern-dronescape.cloud.edu.au {
-  reverse_proxy api-stac:8002
+{
+	email james.gregory@utas.edu.au
 }
 
-tiles.tern-dronescape.cloud.edu.au {
-  reverse_proxy api-titiler
+stacapi.tern-dronescape.cloud.edu.au {
+	reverse_proxy api-stac:8002
 }
 
-tern-dronescape.cloud.edu.au {
-  reverse_proxy web-app
+titiler.tern-dronescape.cloud.edu.au {
+	reverse_proxy api-titiler
+}
+
+app.tern-dronescape.cloud.edu.au {
+	reverse_proxy web-app
 }
