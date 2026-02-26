@@ -9,18 +9,21 @@ export function DeckMap() {
     const viewState = useDeck((s) => s.viewState)
     const updateViewState = useDeck((s) => s.updateViewState)
 
+    // Canvas size
+    const setSize = useDeck((s) => s.setSize)
+
     // Layers
     const layers = useDeck((s) => s.layers)
 
-    // Keep our deck instance in a store
+    // Deck Ref
     const deckRef = useRef<DeckGLRef>(null)
-    const setDeck = useDeck(s => s.setDeck)
+    const setDeck = useDeck((s) => s.setDeck)
     useEffect(() => {
         if (deckRef.current?.deck) {
             setDeck(deckRef.current.deck)
         }
     }, [deckRef])
-
+    const setIsLoaded = useDeck((s) => s.setIsLoaded)
 
     return (
         <div onContextMenu={(e) => e.preventDefault()}>
@@ -32,6 +35,8 @@ export function DeckMap() {
                     updateViewState(viewState)
                 }
                 ref={deckRef}
+                onResize={(size) => setSize(size)}
+                onLoad={() => setIsLoaded(true)}
             >
                 <Map mapStyle="https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json" />
             </DeckGL>

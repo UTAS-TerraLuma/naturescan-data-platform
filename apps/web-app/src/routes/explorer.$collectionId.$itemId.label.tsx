@@ -3,12 +3,14 @@ import { useDeck } from "@/stores/deck-store"
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { useEffect, useState } from "react"
-import { PolygonLayer } from "@deck.gl/layers"
-import { COORDINATE_SYSTEM } from "@deck.gl/core"
+import { PolygonLayer, TextLayer } from "@deck.gl/layers"
+import { COORDINATE_SYSTEM, WebMercatorViewport } from "@deck.gl/core"
+
+import { format } from 'd3-format'
+
+const coordFormat = format(",.2f")
 
 import { Proj4Projection } from "@math.gl/proj4"
-import { Field, FieldLabel } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
 
 Proj4Projection.defineProjectionAliases({
     "EPSG:7855":
@@ -21,40 +23,45 @@ export const Route = createFileRoute("/explorer/$collectionId/$itemId/label")({
     component: RouteComponent,
 })
 
+const BOX_SCALE = 0.75
+
 function RouteComponent() {
     const { collectionId, itemId } = Route.useParams()
     const { data: item } = useSuspenseQuery(
         collectionItemQueryOptions(collectionId, itemId),
     )
 
+    const crsCode = item.properties["proj:code"]
+
     const [size, setSize] = useState(50)
 
+    const deckIsLoaded = useDeck((s) => s.isLoaded)
     const updateLayer = useDeck((s) => s.updateLayer)
     const removeLayer = useDeck((s) => s.removeLayer)
 
     const viewState = useDeck((s) => s.viewState)
 
-
+    const deck = useDeck((s) => s.deck)
 
     useEffect(() => {
-        const id = "bbox"
+        const boxID = "bbox"
+        const textID = "bbox-text"
 
         const { longitude, latitude } = viewState
-
-        const d = size / 2
+        const offset = size / 2
 
         const polygonLayer = new PolygonLayer({
-            id,
+            id: boxID,
             coordinateSystem: COORDINATE_SYSTEM.METER_OFFSETS,
             coordinateOrigin: [longitude, latitude, 1],
             data: [
                 {
                     polygon: [
-                        [-d, -d],
-                        [-d, d],
-                        [d, d],
-                        [d, -d],
-                        [-d, -d],
+                        [-offset, -offset],
+                        [-offset, offset],
+                        [offset, offset],
+                        [offset, -offset],
+                        [-offset, -offset],
                     ],
                 },
             ],
@@ -70,64 +77,71 @@ function RouteComponent() {
             lineWidthUnits: "pixels",
         })
 
-        updateLayer(polygonLayer)
 
-        return () => {
-            removeLayer(id)
-        }
-    }, [
-        updateLayer,
-        removeLayer,
-        viewState.longitude,
-        viewState.latitude,
-        size,
-    ])
+        const [x, y] = projection.project([longitude, latitude])
 
-    useEffect(() => {
-        const id = "clickable-area"
-
-        const polygonLayer = new PolygonLayer({
-            id,
+        const textLayer = new TextLayer({
+            id: textID,
+            coordinateSystem: COORDINATE_SYSTEM.METER_OFFSETS,
+            coordinateOrigin: [longitude, latitude, 1],
             data: [
                 {
-                    polygon: item.geometry.coordinates,
+                    text: `Center (${crsCode}): ${coordFormat(x)} E ${coordFormat(y)} N | Box size: ${size.toFixed(1)} m`,
+                    position: [-offset, -offset],
                 },
             ],
-            getPolygon: (d) => d.polygon,
-
-            stroked: false,
-            // In order to be pickable must be filled
-            // but it can be transparent
-            filled: true,
-            getFillColor: [255, 0, 0, 0],
-
-            pickable: true,
-            onClick: (info) => {
-                if (!info.coordinate) return
-
-                const [lng, lat] = info.coordinate
-                console.log({ lng, lat })
-            },
+            getPosition: (d) => d.position,
+            getText: (d) => d.text,
+            getColor: [255, 0, 0],
+            getSize: 24,
+            backgroundPadding: [5, 5, 5, 5],
+            getPixelOffset: [5, 5],
+            getAlignmentBaseline: "top",
+            getTextAnchor: "start",
+            background: true,
+            getBackgroundColor: [0, 0, 0, 200],
         })
 
         updateLayer(polygonLayer)
+        updateLayer(textLayer)
 
         return () => {
-            removeLayer(id)
+            removeLayer(boxID)
+            removeLayer(textID)
         }
-    }, [item, updateLayer, removeLayer])
+    }, [updateLayer, removeLayer, viewState, size, crsCode])
+
+    useEffect(() => {
+        if (!deck || !deckIsLoaded) return
+
+        // Get bounds of viewport in longitude and latitude
+        const viewport = deck.getViewports()[0] as WebMercatorViewport
+        const [lngmin, latmin, lngmax, latmax] = viewport.getBounds()
+
+        // Convert to projected coordinate space in metres
+        const [xmin, ymin] = projection.project([lngmin, latmin])
+        const [xmax, ymax] = projection.project([lngmax, latmax])
+
+        // Get size of bounding box
+        const width = xmax - xmin
+        const height = ymax - ymin
+        const size = Math.min(width, height) * BOX_SCALE
+        setSize(size)
+    }, [viewState, deck, deckIsLoaded, setSize])
 
     return (
         <div className="px-4 space-y-2">
-            <Field orientation="horizontal">
-                <FieldLabel htmlFor="box-size">Size</FieldLabel>
-                <Input
-                    id="box-size"
-                    type="number"
-                    value={size}
-                    onChange={(e) => setSize(parseInt(e.target.value))}
+            {/*<Field orientation="vertical">
+                <FieldLabel htmlFor="box-scale">Size</FieldLabel>
+                <Slider
+                    id="box-scale"
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    value={boxScale}
+                    onValueChange={v => setBoxScale(v as number)}
                 />
-            </Field>
+            </Field>*/}
         </div>
     )
 }
