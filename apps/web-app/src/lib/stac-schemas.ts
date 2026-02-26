@@ -56,6 +56,19 @@ const polygonGeometrySchema = z.object({
 
 // ---- ITEM ----
 
+const projCodeScema = z.union([
+    z.literal("EPSG:7849"),
+    z.literal("EPSG:7850"),
+    z.literal("EPSG:7851"),
+    z.literal("EPSG:7852"),
+    z.literal("EPSG:7853"),
+    z.literal("EPSG:7854"),
+    z.literal("EPSG:7855"),
+    z.literal("EPSG:7856"),
+])
+
+export type ProjCode = z.infer<typeof projCodeScema>
+
 const itemPropertiesSchema = z.object({
     "proj:transform": z.array(z.number()),
     "proj:projjson": z.any(),
@@ -68,7 +81,7 @@ const itemPropertiesSchema = z.object({
     "naturescan:site": z.string(),
     "naturescan:agl_m": z.number(),
     "naturescan:data_product": z.union([z.literal("rgb"), z.literal("ms")]),
-    "proj:code": z.string().startsWith("EPSG:"),
+    "proj:code": projCodeScema,
     "proj:wkt2": z.string(),
     "proj:shape": z.array(z.number()),
     filename: z.string().optional(),

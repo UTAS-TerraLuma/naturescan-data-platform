@@ -10,15 +10,10 @@ import { format } from "d3-format"
 
 const coordFormat = format(",.2f")
 
-import { Proj4Projection } from "@math.gl/proj4"
+import { Proj4Projection } from "@/lib/projections"
 import { createTitilerUrl } from "@/lib/titiler"
 
-Proj4Projection.defineProjectionAliases({
-    "EPSG:7855":
-        "+proj=utm +zone=55 +south +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs",
-})
 
-const projection = new Proj4Projection({ from: "EPSG:4326", to: "EPSG:7855" })
 
 export const Route = createFileRoute("/explorer/$collectionId/$itemId/label")({
     component: RouteComponent,
@@ -33,6 +28,8 @@ function RouteComponent() {
     )
 
     const crsCode = item.properties["proj:code"]
+
+    const projection = new Proj4Projection({ from: "EPSG:4326", to: crsCode })
 
     const [size, setSize] = useState(50)
 
