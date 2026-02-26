@@ -1,16 +1,17 @@
 import { collectionItemQueryOptions } from "@/lib/stac-queries"
 import { useDeck } from "@/stores/deck-store"
 import { useSuspenseQuery } from "@tanstack/react-query"
-import { createFileRoute } from "@tanstack/react-router"
-import { useEffect, useState } from "react"
+import { createFileRoute, Link } from "@tanstack/react-router"
+import { useEffect, useMemo, useState } from "react"
 import { PolygonLayer, TextLayer } from "@deck.gl/layers"
 import { COORDINATE_SYSTEM, WebMercatorViewport } from "@deck.gl/core"
 
-import { format } from 'd3-format'
+import { format } from "d3-format"
 
 const coordFormat = format(",.2f")
 
 import { Proj4Projection } from "@math.gl/proj4"
+import { createTitilerUrl } from "@/lib/titiler"
 
 Proj4Projection.defineProjectionAliases({
     "EPSG:7855":
@@ -77,7 +78,6 @@ function RouteComponent() {
             lineWidthUnits: "pixels",
         })
 
-
         const [x, y] = projection.project([longitude, latitude])
 
         const textLayer = new TextLayer({
@@ -129,19 +129,37 @@ function RouteComponent() {
         setSize(size)
     }, [viewState, deck, deckIsLoaded, setSize])
 
+    const imageUrl = useMemo(() => {
+        const { longitude, latitude } = viewState
+        const offset = size / 2
+        const [x, y] = projection.project([longitude, latitude])
+
+        const [minx, miny, maxx, maxy] = [
+            x - offset,
+            y - offset,
+            x + offset,
+            y + offset,
+        ]
+
+        const apiRoute = `/cog/bbox/${minx},${miny},${maxx},${maxy}/1036x1036.png`
+
+        return createTitilerUrl(apiRoute, {
+            url: item.assets.main.href,
+            coord_crs: crsCode,
+        })
+    }, [viewState, size, item, crsCode])
+
     return (
         <div className="px-4 space-y-2">
-            {/*<Field orientation="vertical">
-                <FieldLabel htmlFor="box-scale">Size</FieldLabel>
-                <Slider
-                    id="box-scale"
-                    min={0}
-                    max={1}
-                    step={0.01}
-                    value={boxScale}
-                    onValueChange={v => setBoxScale(v as number)}
-                />
-            </Field>*/}
+            <Link
+                to="/labeller"
+                search={{
+                    imageUrl,
+                }}
+                className="underline text-primary"
+            >
+                Label This Subset
+            </Link>
         </div>
     )
 }

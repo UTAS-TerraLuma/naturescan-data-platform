@@ -25,8 +25,8 @@ type Size = {
 }
 
 interface DeckStore {
-    deck?: Deck
-    setDeck: (d: Deck) => void
+    deck: Deck | null
+    setDeck: (d: Deck | null) => void
     isLoaded: boolean
     setIsLoaded: (b: boolean) => void
 
@@ -46,7 +46,7 @@ interface DeckStore {
 export const useDeck = create<DeckStore>()(
     persist(
         (set, get) => ({
-            // deck undefined on init
+            deck: null,
             setDeck: (deck) => set({ deck }),
             isLoaded: false,
             setIsLoaded: (isLoaded) => set({ isLoaded }),

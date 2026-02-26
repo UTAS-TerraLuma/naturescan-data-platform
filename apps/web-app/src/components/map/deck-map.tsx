@@ -18,12 +18,16 @@ export function DeckMap() {
     // Deck Ref
     const deckRef = useRef<DeckGLRef>(null)
     const setDeck = useDeck((s) => s.setDeck)
+    const setIsLoaded = useDeck((s) => s.setIsLoaded)
     useEffect(() => {
         if (deckRef.current?.deck) {
             setDeck(deckRef.current.deck)
         }
-    }, [deckRef])
-    const setIsLoaded = useDeck((s) => s.setIsLoaded)
+        return () => {
+            setDeck(null)
+            setIsLoaded(false)
+        }
+    }, [deckRef, setDeck, setIsLoaded])
 
     return (
         <div onContextMenu={(e) => e.preventDefault()}>
