@@ -1,26 +1,37 @@
-import { useMapViewState } from "@/stores/map-view-state-store"
-import { DeckGL } from "@deck.gl/react"
+import { DeckGL, type DeckGLRef } from "@deck.gl/react"
 import { Map } from "react-map-gl/maplibre"
 import "maplibre-gl/dist/maplibre-gl.css"
-import { useDeckLayers } from "@/stores/deck-layer-store"
+import { useEffect, useRef } from "react"
+import { useDeck } from "@/stores/deck-store"
 
 export function DeckMap() {
-    const viewState = useMapViewState((s) => s.viewState)
-    const updateViewState = useMapViewState((s) => s.updateViewState)
-    const setCanvasSize = useMapViewState((s) => s.setCanvasSize)
+    // View State
+    const viewState = useDeck((s) => s.viewState)
+    const updateViewState = useDeck((s) => s.updateViewState)
 
-    const layers = useDeckLayers((s) => s.layers)
+    // Layers
+    const layers = useDeck((s) => s.layers)
+
+    // Keep our deck instance in a store
+    const deckRef = useRef<DeckGLRef>(null)
+    const setDeck = useDeck(s => s.setDeck)
+    useEffect(() => {
+        if (deckRef.current?.deck) {
+            setDeck(deckRef.current.deck)
+        }
+    }, [deckRef])
+
 
     return (
         <div onContextMenu={(e) => e.preventDefault()}>
             <DeckGL
+                controller
                 viewState={viewState}
+                layers={layers}
                 onViewStateChange={({ viewState }) =>
                     updateViewState(viewState)
                 }
-                controller
-                layers={layers}
-                onResize={(size) => setCanvasSize(size)}
+                ref={deckRef}
             >
                 <Map mapStyle="https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json" />
             </DeckGL>

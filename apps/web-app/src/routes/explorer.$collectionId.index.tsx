@@ -9,7 +9,7 @@ import {
     collectionItemsQueryOptions,
     collectionQueryOptions,
 } from "@/lib/stac-queries"
-import { useMapViewState } from "@/stores/map-view-state-store"
+import { useDeck } from "@/stores/deck-store"
 
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
@@ -30,7 +30,7 @@ function RouteComponent() {
         data: { features },
     } = useSuspenseQuery(collectionItemsQueryOptions(collectionId))
 
-    const fitBounds = useMapViewState((s) => s.fitBounds)
+    const fitBounds = useDeck((s) => s.fitBounds)
 
     useEffect(() => {
         fitBounds(collection.extent.spatial.bbox[0])

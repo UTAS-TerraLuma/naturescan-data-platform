@@ -17,7 +17,6 @@ const ITEMS = "items"
 // ---- COLLECTIONS ----
 
 async function fetchCollections() {
-    console.log(`${STAC_API_URL}/collections`)
     const response = await fetch(`${STAC_API_URL}/collections`)
     const data = await response.json()
 

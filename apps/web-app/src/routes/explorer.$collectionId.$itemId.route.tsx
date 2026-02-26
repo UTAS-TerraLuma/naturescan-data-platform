@@ -8,7 +8,7 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { collectionItemQueryOptions } from "@/lib/stac-queries"
-import { useMapViewState } from "@/stores/map-view-state-store"
+import { useDeck } from "@/stores/deck-store"
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router"
 import { useEffect } from "react"
@@ -29,7 +29,7 @@ function RouteComponent() {
         collectionItemQueryOptions(collectionId, itemId),
     )
 
-    const fitBounds = useMapViewState((s) => s.fitBounds)
+    const fitBounds = useDeck((s) => s.fitBounds)
 
     useEffect(() => {
         fitBounds(item.bbox)

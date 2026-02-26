@@ -1,4 +1,4 @@
-import { useMapViewState } from "@/stores/map-view-state-store"
+import { useDeck } from "@/stores/deck-store"
 import {
     Popover,
     PopoverContent,
@@ -9,7 +9,7 @@ import { Button } from "../ui/button"
 import { useState } from "react"
 
 export function ViewStateDebug() {
-    const viewState = useMapViewState((s) => s.viewState)
+    const viewState = useDeck((s) => s.viewState)
     const [open, setOpen] = useState(false)
 
     return (

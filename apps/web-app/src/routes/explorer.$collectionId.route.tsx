@@ -1,6 +1,6 @@
 import { collectionItemsQueryOptions } from "@/lib/stac-queries"
 import type { StacItem } from "@/lib/stac-schemas"
-import { useDeckLayers } from "@/stores/deck-layer-store"
+import { useDeck } from "@/stores/deck-store"
 import { PolygonLayer } from "@deck.gl/layers"
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { createFileRoute, Outlet } from "@tanstack/react-router"
@@ -16,7 +16,7 @@ function RouteComponent() {
     const { collectionId } = Route.useParams()
     const { data } = useSuspenseQuery(collectionItemsQueryOptions(collectionId))
 
-    const updateLayer = useDeckLayers((s) => s.updateLayer)
+    const updateLayer = useDeck((s) => s.updateLayer)
 
     useEffect(() => {
         const itemsLayer = new PolygonLayer<StacItem>({

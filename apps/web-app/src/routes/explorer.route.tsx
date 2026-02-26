@@ -3,7 +3,7 @@ import { DeckMap } from "@/components/map/deck-map"
 import { ViewStateDebug } from "@/components/map/view-state-debug"
 import { collectionsQueryOptions } from "@/lib/stac-queries"
 import type { StacCollection } from "@/lib/stac-schemas"
-import { useDeckLayers } from "@/stores/deck-layer-store"
+import { useDeck } from "@/stores/deck-store"
 import { PolygonLayer } from "@deck.gl/layers"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Outlet } from "@tanstack/react-router"
@@ -21,7 +21,7 @@ function ExplorerRouteComponent() {
     const { data } = useQuery(collectionsQueryOptions)
 
     // Add collections to map
-    const updateLayer = useDeckLayers((s) => s.updateLayer)
+    const updateLayer = useDeck((s) => s.updateLayer)
     useEffect(() => {
         const collectionsLayer = new PolygonLayer<StacCollection>({
             id: "collections",

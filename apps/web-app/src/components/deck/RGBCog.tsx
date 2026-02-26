@@ -1,13 +1,13 @@
 import type { StacItem } from "@/lib/stac-schemas"
 import { getTilesUrl } from "@/lib/titiler"
-import { useDeckLayers } from "@/stores/deck-layer-store"
+import { useDeck } from "@/stores/deck-store"
 import { TileLayer } from "@deck.gl/geo-layers"
 import { BitmapLayer } from "@deck.gl/layers"
 import { useEffect } from "react"
 
 export function RGBCog({ item }: { item: StacItem }) {
-    const updateLayer = useDeckLayers((s) => s.updateLayer)
-    const removeLayer = useDeckLayers((s) => s.removeLayer)
+    const updateLayer = useDeck((s) => s.updateLayer)
+    const removeLayer = useDeck((s) => s.removeLayer)
 
     useEffect(() => {
         const id = item.id

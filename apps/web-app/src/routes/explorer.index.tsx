@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/card"
 import { getCombinedBounds } from "@/lib/spatial-utils"
 import { collectionsQueryOptions } from "@/lib/stac-queries"
-import { useMapViewState } from "@/stores/map-view-state-store"
+import { useDeck } from "@/stores/deck-store"
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useEffect } from "react"
@@ -21,7 +21,7 @@ function RouteComponent() {
     } = useSuspenseQuery(collectionsQueryOptions)
 
     // Fit map to the bounds of all collections
-    const fitBounds = useMapViewState((s) => s.fitBounds)
+    const fitBounds = useDeck((s) => s.fitBounds)
 
     useEffect(() => {
         const bounds = getCombinedBounds(
