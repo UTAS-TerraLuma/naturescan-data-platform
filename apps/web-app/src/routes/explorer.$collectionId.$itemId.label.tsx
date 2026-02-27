@@ -13,8 +13,6 @@ const coordFormat = format(",.2f")
 import { Proj4Projection } from "@/lib/projections"
 import { createTitilerUrl } from "@/lib/titiler"
 
-
-
 export const Route = createFileRoute("/explorer/$collectionId/$itemId/label")({
     component: RouteComponent,
 })
