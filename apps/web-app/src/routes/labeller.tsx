@@ -2,20 +2,23 @@ import { FullscreenLayout } from "@/components/layouts/fullscreen-layout"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { predictPCS, predictPVS, setImage } from "@/lib/segment"
 import { cn } from "@/lib/utils"
 import { OrthographicView, type OrthographicViewState } from "@deck.gl/core"
 import { BitmapLayer, PathLayer, ScatterplotLayer } from "@deck.gl/layers"
 import DeckGL from "@deck.gl/react"
+import { useMutation } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { useEffect, useRef, useState } from "react"
 import * as z from "zod"
 
 // --- Constants ---
+const IMAGE_SIZE = 1036
+//
 const INITIAL_VIEW_STATE: OrthographicViewState = {
-    target: [0, 0],
+    target: [IMAGE_SIZE / 2, IMAGE_SIZE / 2],
     zoom: 0,
 }
-const IMAGE_SIZE = 1036
 
 // --- Route & Search Params ---
 const labellerSearchSchema = z.object({
@@ -55,23 +58,14 @@ interface ConceptPrompt {
 }
 
 // --- Coordinate utils (module-level, depend only on IMAGE_SIZE constant) ---
-function worldToPixel(wx: number, wy: number): [number, number] {
-    return [
-        Math.round(wx + IMAGE_SIZE / 2),
-        Math.round(IMAGE_SIZE / 2 - wy),
-    ]
-}
-
-function pixelToWorld(px: number, py: number): [number, number] {
-    return [px - IMAGE_SIZE / 2, IMAGE_SIZE / 2 - py]
-}
-
 function bboxToPath(bbox: BBoxPrompt): [number, number][] {
-    const tl = pixelToWorld(bbox.xmin, bbox.ymin)
-    const tr = pixelToWorld(bbox.xmax, bbox.ymin)
-    const br = pixelToWorld(bbox.xmax, bbox.ymax)
-    const bl = pixelToWorld(bbox.xmin, bbox.ymax)
-    return [tl, tr, br, bl, tl]
+    return [
+        [bbox.xmin, bbox.ymin],
+        [bbox.xmax, bbox.ymin],
+        [bbox.xmax, bbox.ymax],
+        [bbox.xmin, bbox.ymax],
+        [bbox.xmin, bbox.ymin],
+    ]
 }
 
 function previewPathFromWorld(
@@ -80,7 +74,13 @@ function previewPathFromWorld(
 ): [number, number][] {
     const [x1, y1] = start
     const [x2, y2] = end
-    return [[x1, y1], [x2, y1], [x2, y2], [x1, y2], [x1, y1]]
+    return [
+        [x1, y1],
+        [x2, y1],
+        [x2, y2],
+        [x1, y2],
+        [x1, y1],
+    ]
 }
 
 function clampPixel(v: number): number {
@@ -88,18 +88,7 @@ function clampPixel(v: number): number {
 }
 
 // --- DeckGL view ---
-const orthoView = new OrthographicView({ controller: true, flipY: false })
-
-// --- API stubs ---
-async function promptableVisualSegmentation(visualPrompts: VisualPrompt[]) {
-    console.log("PVS submit:", visualPrompts)
-    return {}
-}
-
-async function promptableConceptSegmentation(conceptPrompt: ConceptPrompt) {
-    console.log("PCS submit:", conceptPrompt)
-    return {}
-}
+const orthoView = new OrthographicView({ controller: true, flipY: true })
 
 // --- Main Component ---
 function RouteComponent() {
@@ -109,24 +98,46 @@ function RouteComponent() {
     const deckRef = useRef<any>(null)
     const containerRef = useRef<HTMLDivElement>(null)
     const isShiftHeldRef = useRef(false)
-    const modeRef = useRef<"pvs" | "pcs">("pvs")
-    const visualPromptsRef = useRef<VisualPrompt[]>([{ bbox: null, points: [] }])
+    const modeRef = useRef<"pvs" | "pcs">("pcs")
+    const visualPromptsRef = useRef<VisualPrompt[]>([
+        { bbox: null, points: [] },
+    ])
     const currentPromptIdxRef = useRef(0)
     const imageExemplarsRef = useRef<ImageExemplarPrompt[]>([])
     const nounPhraseRef = useRef("")
+    const imageReadyRef = useRef(false)
+
+    // --- SAM3 API mutations ---
+    const setImageMutation = useMutation({
+        mutationFn: () => setImage(imageUrl),
+    })
+    const pvsMutation = useMutation({
+        mutationFn: predictPVS,
+        onSuccess: (data) => console.log("PVS result:", data),
+        onError: (err) => console.error("PVS error:", err),
+    })
+    const pcsMutation = useMutation({
+        mutationFn: predictPCS,
+        onSuccess: (data) => console.log("PCS result:", data),
+        onError: (err) => console.error("PCS error:", err),
+    })
 
     // --- State ---
-    const [mode, setMode] = useState<"pvs" | "pcs">("pvs")
+    const [mode, setMode] = useState<"pvs" | "pcs">("pcs")
     const [visualPrompts, setVisualPrompts] = useState<VisualPrompt[]>([
         { bbox: null, points: [] },
     ])
     const [currentPromptIdx, setCurrentPromptIdx] = useState(0)
     const [nounPhrase, setNounPhrase] = useState("")
-    const [imageExemplars, setImageExemplars] = useState<ImageExemplarPrompt[]>([])
+    const [imageExemplars, setImageExemplars] = useState<ImageExemplarPrompt[]>(
+        [],
+    )
     const [isShiftHeld, setIsShiftHeld] = useState(false)
     const [isDrawingBbox, setIsDrawingBbox] = useState(false)
     const [bboxStart, setBboxStart] = useState<[number, number] | null>(null)
-    const [bboxCurrent, setBboxCurrent] = useState<[number, number] | null>(null)
+    const [bboxCurrent, setBboxCurrent] = useState<[number, number] | null>(
+        null,
+    )
     const [isPositiveDraw, setIsPositiveDraw] = useState(true)
 
     // Keep refs in sync with state
@@ -145,6 +156,16 @@ function RouteComponent() {
     useEffect(() => {
         nounPhraseRef.current = nounPhrase
     }, [nounPhrase])
+    useEffect(() => {
+        imageReadyRef.current = setImageMutation.isSuccess
+    }, [setImageMutation.isSuccess])
+
+    // Kick off set-image on mount (and whenever imageUrl changes)
+    useEffect(() => {
+        setImageMutation.mutate()
+    }, [imageUrl]) // eslint-disable-line react-hooks/exhaustive-deps
+
+    const imageReady = setImageMutation.isSuccess
 
     // --- Screen → world coords via DeckGL viewport ---
     function screenToWorld(x: number, y: number): [number, number] {
@@ -162,16 +183,20 @@ function RouteComponent() {
             }
             if (e.key === "Enter") {
                 if (e.shiftKey) {
+                    if (!imageReadyRef.current) return
                     if (modeRef.current === "pvs") {
-                        promptableVisualSegmentation(visualPromptsRef.current)
+                        pvsMutation.mutate(visualPromptsRef.current)
                     } else {
-                        promptableConceptSegmentation({
+                        pcsMutation.mutate({
                             nounPhrase: nounPhraseRef.current,
                             imageExemplars: imageExemplarsRef.current,
                         })
                     }
                 } else if (modeRef.current === "pvs") {
-                    setVisualPrompts((prev) => [...prev, { bbox: null, points: [] }])
+                    setVisualPrompts((prev) => [
+                        ...prev,
+                        { bbox: null, points: [] },
+                    ])
                     setCurrentPromptIdx((prev) => prev + 1)
                 }
             }
@@ -199,15 +224,21 @@ function RouteComponent() {
             if (isShiftHeldRef.current) return
             if (modeRef.current !== "pvs") return
             const rect = container.getBoundingClientRect()
-            const [wx, wy] = screenToWorld(e.clientX - rect.left, e.clientY - rect.top)
-            const cx = clampPixel(worldToPixel(wx, wy)[0])
-            const cy = clampPixel(worldToPixel(wx, wy)[1])
+            const [wx, wy] = screenToWorld(
+                e.clientX - rect.left,
+                e.clientY - rect.top,
+            )
+            const cx = clampPixel(Math.round(wx))
+            const cy = clampPixel(Math.round(wy))
             setVisualPrompts((prev) => {
                 const next = [...prev]
                 const idx = currentPromptIdxRef.current
                 next[idx] = {
                     ...next[idx],
-                    points: [...next[idx].points, { x: cx, y: cy, label: false }],
+                    points: [
+                        ...next[idx].points,
+                        { x: cx, y: cy, label: false },
+                    ],
                 }
                 return next
             })
@@ -227,8 +258,8 @@ function RouteComponent() {
         } else {
             ;[wx, wy] = screenToWorld(info.x, info.y)
         }
-        const cx = clampPixel(worldToPixel(wx, wy)[0])
-        const cy = clampPixel(worldToPixel(wx, wy)[1])
+        const cx = clampPixel(Math.round(wx))
+        const cy = clampPixel(Math.round(wy))
         setVisualPrompts((prev) => {
             const next = [...prev]
             const idx = currentPromptIdxRef.current
@@ -245,7 +276,10 @@ function RouteComponent() {
         if (isDrawingBbox) return
         e.preventDefault()
         const rect = containerRef.current!.getBoundingClientRect()
-        const [wx, wy] = screenToWorld(e.clientX - rect.left, e.clientY - rect.top)
+        const [wx, wy] = screenToWorld(
+            e.clientX - rect.left,
+            e.clientY - rect.top,
+        )
         setBboxStart([wx, wy])
         setBboxCurrent([wx, wy])
         setIsDrawingBbox(true)
@@ -255,14 +289,20 @@ function RouteComponent() {
     function handleOverlayMouseMove(e: React.MouseEvent) {
         if (!isDrawingBbox) return
         const rect = containerRef.current!.getBoundingClientRect()
-        const [wx, wy] = screenToWorld(e.clientX - rect.left, e.clientY - rect.top)
+        const [wx, wy] = screenToWorld(
+            e.clientX - rect.left,
+            e.clientY - rect.top,
+        )
         setBboxCurrent([wx, wy])
     }
 
     function handleOverlayMouseUp() {
         if (!isDrawingBbox || !bboxStart || !bboxCurrent) return
-        const [sx, sy] = worldToPixel(bboxStart[0], bboxStart[1])
-        const [ex, ey] = worldToPixel(bboxCurrent[0], bboxCurrent[1])
+        const [sx, sy] = [Math.round(bboxStart[0]), Math.round(bboxStart[1])]
+        const [ex, ey] = [
+            Math.round(bboxCurrent[0]),
+            Math.round(bboxCurrent[1]),
+        ]
         const bbox: BBoxPrompt = {
             xmin: clampPixel(Math.min(sx, ex)),
             xmax: clampPixel(Math.max(sx, ex)),
@@ -284,7 +324,10 @@ function RouteComponent() {
                 return next
             })
         } else {
-            setImageExemplars((prev) => [...prev, { ...bbox, label: isPositiveDraw }])
+            setImageExemplars((prev) => [
+                ...prev,
+                { ...bbox, label: isPositiveDraw },
+            ])
         }
         setIsDrawingBbox(false)
         setBboxStart(null)
@@ -294,7 +337,8 @@ function RouteComponent() {
     // --- DeckGL Layers ---
     const imageLayer = new BitmapLayer({
         id: "image-layer",
-        bounds: [-IMAGE_SIZE / 2, -IMAGE_SIZE / 2, IMAGE_SIZE / 2, IMAGE_SIZE / 2],
+        // left bottom right top
+        bounds: [0, IMAGE_SIZE, IMAGE_SIZE, 0],
         image: imageUrl,
         textureParameters: { minFilter: "nearest", magFilter: "nearest" },
         pickable: false,
@@ -302,7 +346,7 @@ function RouteComponent() {
 
     const pointsData = visualPrompts.flatMap((vp, i) =>
         vp.points.map((pt) => ({
-            position: pixelToWorld(pt.x, pt.y),
+            position: [pt.x, pt.y] as [number, number],
             color: pt.label
                 ? i === currentPromptIdx
                     ? [0, 200, 0, 255]
@@ -357,7 +401,9 @@ function RouteComponent() {
                   data: [
                       {
                           path: previewPathFromWorld(bboxStart, bboxCurrent),
-                          color: isPositiveDraw ? [0, 200, 0, 180] : [200, 0, 0, 180],
+                          color: isPositiveDraw
+                              ? [0, 200, 0, 180]
+                              : [200, 0, 0, 180],
                       },
                   ],
                   getPath: (d: any) => d.path,
@@ -370,8 +416,17 @@ function RouteComponent() {
 
     const layers =
         mode === "pvs"
-            ? [imageLayer, scatterLayer, pvsBboxPathLayer, ...(previewLayer ? [previewLayer] : [])]
-            : [imageLayer, pcsBboxPathLayer, ...(previewLayer ? [previewLayer] : [])]
+            ? [
+                  imageLayer,
+                  scatterLayer,
+                  pvsBboxPathLayer,
+                  ...(previewLayer ? [previewLayer] : []),
+              ]
+            : [
+                  imageLayer,
+                  pcsBboxPathLayer,
+                  ...(previewLayer ? [previewLayer] : []),
+              ]
 
     const overlayActive = isShiftHeld || isDrawingBbox
     const positiveCount = imageExemplars.filter((e) => e.label).length
@@ -379,7 +434,10 @@ function RouteComponent() {
 
     return (
         <FullscreenLayout>
-            <div ref={containerRef} style={{ position: "relative", width: "100%", height: "100%" }}>
+            <div
+                ref={containerRef}
+                style={{ position: "relative", width: "100%", height: "100%" }}
+            >
                 <DeckGL
                     ref={deckRef}
                     initialViewState={INITIAL_VIEW_STATE}
@@ -405,6 +463,33 @@ function RouteComponent() {
 
                 {/* Floating UI panel */}
                 <div className="absolute top-4 left-4 w-72 bg-background/90 backdrop-blur border rounded-lg p-3 z-20 flex flex-col gap-3">
+                    {/* Image readiness status */}
+                    <div className="flex items-center gap-2 text-xs">
+                        {setImageMutation.isPending && (
+                            <>
+                                <span className="size-2 rounded-full bg-yellow-400 animate-pulse" />
+                                <span className="text-muted-foreground">
+                                    Preparing image…
+                                </span>
+                            </>
+                        )}
+                        {setImageMutation.isSuccess && (
+                            <>
+                                <span className="size-2 rounded-full bg-green-500" />
+                                <span className="text-muted-foreground">
+                                    Ready
+                                </span>
+                            </>
+                        )}
+                        {setImageMutation.isError && (
+                            <>
+                                <span className="size-2 rounded-full bg-red-500" />
+                                <span className="text-muted-foreground">
+                                    Failed to load image
+                                </span>
+                            </>
+                        )}
+                    </div>
                     {/* Mode toggle */}
                     <div className="flex gap-2">
                         <Button
@@ -440,26 +525,45 @@ function RouteComponent() {
                                     >
                                         <span
                                             className="flex-1 cursor-pointer"
-                                            onClick={() => setCurrentPromptIdx(i)}
+                                            onClick={() =>
+                                                setCurrentPromptIdx(i)
+                                            }
                                         >
                                             Prompt {i + 1}
-                                            {i === currentPromptIdx ? " (current)" : ""}:{" "}
-                                            {vp.bbox ? "1 bbox" : "no bbox"},{" "}
-                                            {vp.points.length} pt{vp.points.length !== 1 ? "s" : ""}
+                                            {i === currentPromptIdx
+                                                ? " (current)"
+                                                : ""}
+                                            : {vp.bbox ? "1 bbox" : "no bbox"},{" "}
+                                            {vp.points.length} pt
+                                            {vp.points.length !== 1 ? "s" : ""}
                                         </span>
                                         <button
                                             className="shrink-0 opacity-50 hover:opacity-100 leading-none"
                                             onClick={(e) => {
                                                 e.stopPropagation()
-                                                if (visualPrompts.length === 1) {
-                                                    setVisualPrompts([{ bbox: null, points: [] }])
+                                                if (
+                                                    visualPrompts.length === 1
+                                                ) {
+                                                    setVisualPrompts([
+                                                        {
+                                                            bbox: null,
+                                                            points: [],
+                                                        },
+                                                    ])
                                                     setCurrentPromptIdx(0)
                                                 } else {
                                                     setVisualPrompts((prev) =>
-                                                        prev.filter((_, j) => j !== i),
+                                                        prev.filter(
+                                                            (_, j) => j !== i,
+                                                        ),
                                                     )
-                                                    setCurrentPromptIdx((prev) =>
-                                                        Math.min(prev, visualPrompts.length - 2),
+                                                    setCurrentPromptIdx(
+                                                        (prev) =>
+                                                            Math.min(
+                                                                prev,
+                                                                visualPrompts.length -
+                                                                    2,
+                                                            ),
                                                     )
                                                 }
                                             }}
@@ -483,15 +587,22 @@ function RouteComponent() {
                                     }}
                                 >
                                     + Next Prompt
-                                    <span className="ml-1 opacity-50 font-mono text-[10px]">↵</span>
+                                    <span className="ml-1 opacity-50 font-mono text-[10px]">
+                                        ↵
+                                    </span>
                                 </Button>
                                 <Button
                                     size="sm"
                                     className="flex-1"
-                                    onClick={() => promptableVisualSegmentation(visualPrompts)}
+                                    disabled={!imageReady}
+                                    onClick={() =>
+                                        pvsMutation.mutate(visualPrompts)
+                                    }
                                 >
                                     ▶ Submit
-                                    <span className="ml-1 opacity-50 font-mono text-[10px]">⇧↵</span>
+                                    <span className="ml-1 opacity-50 font-mono text-[10px]">
+                                        ⇧↵
+                                    </span>
                                 </Button>
                             </div>
                         </>
@@ -500,10 +611,14 @@ function RouteComponent() {
                     {mode === "pcs" && (
                         <>
                             <div className="flex flex-col gap-1">
-                                <span className="text-xs text-muted-foreground">Noun phrase</span>
+                                <span className="text-xs text-muted-foreground">
+                                    Noun phrase
+                                </span>
                                 <Input
                                     value={nounPhrase}
-                                    onChange={(e) => setNounPhrase(e.target.value)}
+                                    onChange={(e) =>
+                                        setNounPhrase(e.target.value)
+                                    }
                                     placeholder="e.g. tree, vehicle"
                                     className="h-7 text-xs"
                                 />
@@ -525,12 +640,18 @@ function RouteComponent() {
                             </div>
                             <Button
                                 size="sm"
+                                disabled={!imageReady}
                                 onClick={() =>
-                                    promptableConceptSegmentation({ nounPhrase, imageExemplars })
+                                    pcsMutation.mutate({
+                                        nounPhrase,
+                                        imageExemplars,
+                                    })
                                 }
                             >
                                 ▶ Submit
-                                <span className="ml-1 opacity-50 font-mono text-[10px]">⇧↵</span>
+                                <span className="ml-1 opacity-50 font-mono text-[10px]">
+                                    ⇧↵
+                                </span>
                             </Button>
                         </>
                     )}
