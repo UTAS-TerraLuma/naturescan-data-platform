@@ -2,7 +2,6 @@ import { FullscreenLayout } from "@/components/layouts/fullscreen-layout"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { predictPCS, predictPVS, setImage } from "@/lib/segment"
 import { cn } from "@/lib/utils"
 import { OrthographicView, type OrthographicViewState } from "@deck.gl/core"
 import { BitmapLayer, PathLayer, ScatterplotLayer } from "@deck.gl/layers"
@@ -10,52 +9,28 @@ import DeckGL from "@deck.gl/react"
 import { useMutation } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { useEffect, useRef, useState } from "react"
-import * as z from "zod"
 
-// --- Constants ---
+import { predictPCS, predictPVS, setImage } from "./-api"
+import {
+    labellerSearchSchema,
+    type BBoxPrompt,
+    type ImageExemplarPrompt,
+    type VisualPrompt,
+} from "./-types"
+
+// ---- Constants ----
 const IMAGE_SIZE = 1036
-//
 const INITIAL_VIEW_STATE: OrthographicViewState = {
     target: [IMAGE_SIZE / 2, IMAGE_SIZE / 2],
     zoom: 0,
 }
 
-// --- Route & Search Params ---
-const labellerSearchSchema = z.object({
-    imageUrl: z.url(),
-})
-export const Route = createFileRoute("/labeller")({
+// ---- Route ----
+
+export const Route = createFileRoute("/labeller/oldroute")({
     component: RouteComponent,
     validateSearch: labellerSearchSchema,
 })
-
-// --- Types ---
-interface PointPrompt {
-    x: number
-    y: number
-    label: boolean
-}
-
-interface BBoxPrompt {
-    xmin: number
-    ymin: number
-    xmax: number
-    ymax: number
-}
-
-interface VisualPrompt {
-    bbox: BBoxPrompt | null
-    points: PointPrompt[]
-}
-
-interface ImageExemplarPrompt extends BBoxPrompt {
-    label: boolean
-}
-
-interface ConceptPrompt {
-    nounPhrase: string
-    imageExemplars: ImageExemplarPrompt[]
-}
 
 // --- Coordinate utils (module-level, depend only on IMAGE_SIZE constant) ---
 function bboxToPath(bbox: BBoxPrompt): [number, number][] {

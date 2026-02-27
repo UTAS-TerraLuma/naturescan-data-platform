@@ -1,3 +1,13 @@
-export function FullscreenLayout({ children }: { children: React.ReactNode }) {
-    return <div className="h-screen relative">{children}</div>
+import { cn } from "@/lib/utils"
+
+export function FullscreenLayout({
+    children,
+    className,
+    ...props
+}: React.ComponentProps<"div">) {
+    return (
+        <div className={cn("h-screen relative", className)} {...props}>
+            {children}
+        </div>
+    )
 }

@@ -1,15 +1,13 @@
 import * as z from "zod"
 
-const API_URL = import.meta.env.VITE_SEGMENTATION_API
-
-// --- SAM3 types (mirror of labeller.tsx frontend types) ---
-interface PointPrompt {
+// --- Prompts ----
+export interface PointPrompt {
     x: number
     y: number
     label: boolean
 }
 
-interface BBoxPrompt {
+export interface BBoxPrompt {
     xmin: number
     ymin: number
     xmax: number
@@ -21,7 +19,7 @@ export interface VisualPrompt {
     points: PointPrompt[]
 }
 
-interface ImageExemplarPrompt extends BBoxPrompt {
+export interface ImageExemplarPrompt extends BBoxPrompt {
     label: boolean
 }
 
@@ -30,9 +28,15 @@ export interface ConceptPrompt {
     imageExemplars: ImageExemplarPrompt[]
 }
 
-// --- Return Schemas ---
+export type PromptMode = "pcs" | "pvs"
 
-const resultSchema = z.array(
+// ---- Route ----
+export const labellerSearchSchema = z.object({
+    imageUrl: z.url(),
+})
+
+// ---- Results ----
+export const resultSchema = z.array(
     z.object({
         name: z.string(),
         class: z.any(),
@@ -50,7 +54,9 @@ const resultSchema = z.array(
     }),
 )
 
-const pcsResult = z.object({
+export type Result = z.infer<typeof resultSchema>
+
+export const pcsResultsSchema = z.object({
     mode: z.literal("pcs"),
     imageURL: z.url(),
     prompts: z.object({
@@ -68,7 +74,9 @@ const pcsResult = z.object({
     results: z.array(resultSchema),
 })
 
-const pvsResults = z.object({
+export type PCSResult = z.infer<typeof pcsResultsSchema>
+
+export const pvsResultsSchema = z.object({
     mode: z.literal("pvs"),
     imageURL: z.url(),
     prompts: z.array(
@@ -91,47 +99,9 @@ const pvsResults = z.object({
     results: z.array(resultSchema),
 })
 
-// --- SAM3 API functions ---
+export type PVSResult = z.infer<typeof pvsResultsSchema>
 
-export async function setImage(imageUrl: string): Promise<void> {
-    const res = await fetch(
-        `${API_URL}/set-image?image_path=${encodeURIComponent(imageUrl)}`,
-        {
-            method: "POST",
-        },
-    )
-    if (!res.ok) throw new Error(`set-image failed: ${res.status}`)
-}
+// --- Component ----
 
-export async function predictPVS(prompts: VisualPrompt[]): Promise<unknown> {
-    const body = {
-        prompts,
-    }
-    const res = await fetch(`${API_URL}/pvs`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-    })
-    if (!res.ok) throw new Error(`pvs failed: ${res.status}`)
-
-    const json = await res.json()
-    console.log(json)
-
-    return pvsResults.parse(json)
-}
-
-export async function predictPCS(prompt: ConceptPrompt): Promise<unknown> {
-    const body = {
-        prompt,
-    }
-    const res = await fetch(`${API_URL}/pcs`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-    })
-    if (!res.ok) throw new Error(`pcs failed: ${res.status}`)
-
-    const json = await res.json()
-    console.log(json)
-    return pcsResult.parse(json)
-}
+type Point2D = [number, number]
+export type BoxCorners = [Point2D, Point2D]
