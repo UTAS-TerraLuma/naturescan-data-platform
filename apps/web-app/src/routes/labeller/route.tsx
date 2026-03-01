@@ -22,6 +22,7 @@ import { getBBoxPrompt, roundAndClampCoords } from "./-utils"
 import { useKeyPress } from "@/hooks/useKeyPress"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
+import { Trash2 } from "lucide-react"
 
 // ---- Constants ----
 export const IMAGE_SIZE = 1036
@@ -55,37 +56,46 @@ function RouteComponent() {
         setImageMutation.mutate()
     }, [imageUrl])
 
+    // ---- Prompt Mode ----
+    const [mode, setMode] = useState<PromptMode>("pvs")
+    const [pvsAutoMode, setPvsAutoMode] = useState(true)
+
+    // ---- PVS Prompt State ----
+    const [pvsBoxCorners, setPvsBoxCorners] =
+        useState<BoxCorners>(EMPTY_BOX_CORNERS)
+    // These are used when not in auto mode
+    const [pvsBboxPrompt, setPvsBboxPrompt] = useState<BBoxPrompt | null>(null)
+    const [pvsPoints, setPvsPoints] = useState<PointPrompt[]>([])
+    const isPvsPrompts = pvsPoints.length > 0 || pvsBboxPrompt != null
+    const clearPvsState = () => {
+        // Rest all prompt state holders
+        setPvsBoxCorners(EMPTY_BOX_CORNERS)
+        setPvsBboxPrompt(null)
+        setPvsPoints([])
+    }
+
     // ---- Prediction Mutations
     const [pvsResults, setPvsResults] = useState<PVSResult[]>([])
 
     const pvsMutation = useMutation({
         mutationFn: predictPVS,
-        onSuccess: (result: PVSResult) => setPvsResults((r) => [...r, result]),
+        onSuccess: (result: PVSResult) => (
+            console.log(result),
+            setPvsResults((r) => [...r, result])
+        ),
         onError: (err) => console.error("PVS error:", err),
+        onSettled: clearPvsState,
     })
 
-    // ---- Prompt Mode ----
-    const [mode, setMode] = useState<PromptMode>("pvs")
-
-    // ---- PVS State ----
-    const [pvsBoxCorners, setPvsBoxCorners] =
-        useState<BoxCorners>(EMPTY_BOX_CORNERS)
-    const [pvsAutoMode, setPvsAutoMode] = useState(true)
-    const pvsComplexMode = !pvsAutoMode
-    // These are only used in complex mode
-    const [pvsBboxPrompt, setPvsBboxPrompt] = useState<BBoxPrompt | null>(null)
-    const [pvsPoints, setPvsPoints] = useState<PointPrompt[]>([])
-    const pvsComplexPredict = useCallback(() => {
-        if (!(mode === "pvs" && pvsAutoMode)) return
+    const pvsNonAutoPredict = () => {
+        // Only call when in PVS mode and note in auto mode
+        if (!(mode == "pvs" && !pvsAutoMode)) return
 
         pvsMutation.mutate({
             bbox: pvsBboxPrompt,
             points: pvsPoints,
         })
-        setPvsBoxCorners(EMPTY_BOX_CORNERS)
-        setPvsBboxPrompt(null)
-        setPvsPoints([])
-    }, [pvsBboxPrompt, pvsPoints, mode, pvsAutoMode])
+    }
 
     // ---- PCS State ----
 
@@ -155,10 +165,10 @@ function RouteComponent() {
         () => setIsShiftPressed(false),
     )
 
-    useKeyPress("v", () => setMode("pvs"))
-    useKeyPress("c", () => setMode("pcs"))
-    useKeyPress("a", () => setPvsAutoMode((b) => !b))
-    useKeyPress("Enter", pvsComplexPredict)
+    // useKeyPress("v", () => setMode("pvs"))
+    // useKeyPress("c", () => setMode("pcs"))
+    // useKeyPress("a", () => setPvsAutoMode((b) => !b))
+    useKeyPress("Enter", pvsNonAutoPredict)
 
     return (
         <FullscreenLayout className="bg-neutral-200">
@@ -176,16 +186,21 @@ function RouteComponent() {
                         dragPan: true,
                     }}
                     onClick={(info, event) => {
+                        // Only handle left button clicks
+                        if (!event.leftButton) return
+
                         if (mode == "pvs") {
                             const [x, y] = roundAndClampCoords(info.coordinate!)
                             if (pvsAutoMode) {
-                                const label = !event.rightButton
-                                setPvsPoints((p) => [...p, { x, y, label }])
-                            } else {
+                                // On auto mode, call predict straight away
                                 pvsMutation.mutate({
                                     bbox: null,
                                     points: [{ x, y, label: true }],
                                 })
+                            } else {
+                                // Otherwise set the prompt
+                                const label = !isShiftPressed
+                                setPvsPoints((p) => [...p, { x, y, label }])
                             }
                         }
                     }}
@@ -233,15 +248,24 @@ function RouteComponent() {
 
                             if (mode == "pvs") {
                                 if (pvsAutoMode) {
+                                    // In auto mode, call the prediction straight away
+                                    pvsMutation.mutate(
+                                        {
+                                            bbox: getBBoxPrompt(pvsBoxCorners),
+                                            points: [],
+                                        },
+                                        {
+                                            onSettled: () =>
+                                                setPvsBoxCorners(
+                                                    EMPTY_BOX_CORNERS,
+                                                ),
+                                        },
+                                    )
+                                } else {
+                                    // In non auto mode, set the bbox prompt
                                     setPvsBboxPrompt(
                                         getBBoxPrompt(pvsBoxCorners),
                                     )
-                                } else {
-                                    pvsMutation.mutate({
-                                        bbox: getBBoxPrompt(pvsBoxCorners),
-                                        points: [],
-                                    })
-                                    setPvsBoxCorners(EMPTY_BOX_CORNERS)
                                 }
                             }
                         }
@@ -254,23 +278,15 @@ function RouteComponent() {
                     <Label>Segmentation Mode</Label>
                     <Tabs value={mode} onValueChange={(v) => setMode(v)}>
                         <TabsList>
-                            <TabsTrigger value="pvs">
-                                <Kbd>V</Kbd>
-                                Visual
-                            </TabsTrigger>
-                            <TabsTrigger value="pcs">
-                                <Kbd>C</Kbd>
-                                Concept
-                            </TabsTrigger>
+                            <TabsTrigger value="pvs">Visual</TabsTrigger>
+                            <TabsTrigger value="pcs">Concept</TabsTrigger>
                         </TabsList>
                     </Tabs>
                 </div>
                 {mode == "pvs" && (
                     <>
                         <div className="flex gap-3">
-                            <Label htmlFor="pvs-complex-mode">
-                                Auto Mode <Kbd>A</Kbd>
-                            </Label>
+                            <Label htmlFor="pvs-complex-mode">Auto Mode</Label>
                             <Switch
                                 id="pvs-complex-mode"
                                 checked={pvsAutoMode}
@@ -279,10 +295,23 @@ function RouteComponent() {
                         </div>
                         {!pvsAutoMode && (
                             <div className="flex gap-2">
-                                <Button onClick={pvsComplexPredict}>
+                                <Button
+                                    onClick={pvsNonAutoPredict}
+                                    disabled={!isPvsPrompts}
+                                    variant="outline"
+                                    size="lg"
+                                >
                                     Predict
+                                    <Kbd>⏎</Kbd>
                                 </Button>
-                                <Button>Clear</Button>
+                                <Button
+                                    onClick={clearPvsState}
+                                    disabled={!isPvsPrompts}
+                                    variant="ghost"
+                                    size="lg"
+                                >
+                                    Clear
+                                </Button>
                             </div>
                         )}
                     </>
