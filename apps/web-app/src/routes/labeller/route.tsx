@@ -66,6 +66,15 @@ function RouteComponent() {
     // ---- Prediction Mutations
     const [predictionResults, setPredictionResults] =
         useState<PredictionResults>([])
+    const addResults = (newResults: PredictionResults) =>
+        setPredictionResults((oldResults) => [...oldResults, ...newResults])
+    const removeResults = (id: string | string[]) =>
+        setPredictionResults((results) =>
+            results.filter((d) =>
+                Array.isArray(id) ? !id.includes(d.id) : d.id !== id,
+            ),
+        )
+    const [selectedResults, setSelectedResults] = useState<string[]>([])
 
     // ---- PVS Prompt State ----
     const [pvsBoxCorners, setPvsBoxCorners] =
@@ -84,8 +93,7 @@ function RouteComponent() {
     // ---- PVS Mutations ----
     const pvsMutation = useMutation({
         mutationFn: predictPVS,
-        onSuccess: (result: PredictionResults) =>
-            setPredictionResults((r) => [...r, ...result]),
+        onSuccess: addResults,
         onError: (err) => console.error("PVS error:", err),
         onSettled: clearPvsState,
     })
@@ -116,7 +124,7 @@ function RouteComponent() {
 
     const pcsMutation = useMutation({
         mutationFn: predictPCS,
-        onSuccess: (results) => setPredictionResults((r) => [...r, ...results]),
+        onSuccess: addResults,
         onError: (err) => console.error("PCS error:", err),
         onSettled: clearPcsState,
     })
@@ -138,6 +146,11 @@ function RouteComponent() {
         () => setIsShiftPressed(true),
         () => setIsShiftPressed(false),
     )
+
+    useKeyPress("Delete", () => {
+        removeResults(selectedResults)
+        setSelectedResults([])
+    })
 
     const handleEnter = useCallback(() => {
         if (mode === "pvs") pvsComplexPredict()
@@ -225,16 +238,33 @@ function RouteComponent() {
     const predictionResultsLayer = new PolygonLayer<PredictionResult>({
         id: "prediction-results-layer",
         data: predictionResults,
-        getPolygon: (d) => {
-            const segments = d.result.segments
-            const coords = segments.x.map((x, i) => [x, segments.y[i]])
-            coords.push([segments.x[0], segments.y[0]])
-            return coords
-        },
+        getPolygon: (d) => d.result.polygon,
         filled: true,
         getFillColor: [0, 0, 255, 50],
         stroked: true,
         getLineColor: [0, 0, 255],
+
+        getLineWidth: (d) => (selectedResults.includes(d.id) ? 3 : 1),
+        lineWidthUnits: "pixels",
+        pickable: true,
+
+        onClick: (info, event) => {
+            // @ts-ignore
+            if (!event.leftButton) return
+
+            if (!info.object) return
+            const { id } = info.object as PredictionResult
+
+            if (isShiftPressed) {
+                setSelectedResults((s) => [...s, id])
+            } else {
+                setSelectedResults([id])
+            }
+        },
+
+        updateTriggers: {
+            getLineWidth: selectedResults,
+        },
     })
 
     return (
@@ -256,7 +286,7 @@ function RouteComponent() {
                     }}
                     onClick={(info, event) => {
                         // Only handle left button clicks
-                        if (!event.leftButton) return
+                        if (!event.rightButton) return
 
                         if (mode == "pvs") {
                             const [x, y] = roundAndClampCoords(info.coordinate!)

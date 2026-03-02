@@ -46,10 +46,7 @@ export const resultSchema = z.object({
         y1: z.number(),
         y2: z.number(),
     }),
-    segments: z.object({
-        x: z.array(z.number()),
-        y: z.array(z.number()),
-    }),
+    polygon: z.array(z.tuple([z.number(), z.number()])),
 })
 export type Result = z.infer<typeof resultSchema>
 
@@ -92,6 +89,7 @@ const pcsPromptSchema = z.object({
 
 export const predictionResultsSchema = z.array(
     z.object({
+        id: z.string(),
         imageURL: z.url(),
         prompt: z.union([pvsPromptSechma, pcsPromptSchema]),
         result: resultSchema,
