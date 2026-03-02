@@ -60,7 +60,8 @@ function RouteComponent() {
 
     // ---- Prompt Mode ----
     const [mode, setMode] = useState<PromptMode>("pvs")
-    const [pvsAutoMode, setPvsAutoMode] = useState(true)
+    const [pvsSimpleMode, setPvsSimpleMode] = useState(true)
+    const [hasAutoSegmented, setHasAutoSegmented] = useState(false)
 
     // ---- Prediction Mutations
     const [predictionResults, setPredictionResults] =
@@ -69,7 +70,7 @@ function RouteComponent() {
     // ---- PVS Prompt State ----
     const [pvsBoxCorners, setPvsBoxCorners] =
         useState<BoxCorners>(EMPTY_BOX_CORNERS)
-    // These are used when not in auto mode
+    // These are used when not in simple mode
     const [pvsBboxPrompt, setPvsBboxPrompt] = useState<BBoxPrompt | null>(null)
     const [pvsPoints, setPvsPoints] = useState<PointPrompt[]>([])
     const isPvsPrompts = pvsPoints.length > 0 || pvsBboxPrompt != null
@@ -89,15 +90,15 @@ function RouteComponent() {
         onSettled: clearPvsState,
     })
 
-    const pvsNonAutoPredict = useCallback(() => {
-        // Only call when in PVS mode and not in auto mode
-        if (!(mode == "pvs" && !pvsAutoMode)) return
+    const pvsComplexPredict = useCallback(() => {
+        // Only call when in PVS mode and not in simple mode
+        if (!(mode == "pvs" && !pvsSimpleMode)) return
 
         pvsMutation.mutate({
             bbox: pvsBboxPrompt,
             points: pvsPoints,
         })
-    }, [mode, pvsAutoMode, pvsBboxPrompt, pvsPoints, pvsMutation])
+    }, [mode, pvsSimpleMode, pvsBboxPrompt, pvsPoints, pvsMutation])
 
     // ---- PCS State ----
     const [pcsBoxCorners, setPcsBoxCorners] =
@@ -138,13 +139,10 @@ function RouteComponent() {
         () => setIsShiftPressed(false),
     )
 
-    // useKeyPress("v", () => setMode("pvs"))
-    // useKeyPress("c", () => setMode("pcs"))
-    // useKeyPress("a", () => setPvsAutoMode((b) => !b))
     const handleEnter = useCallback(() => {
-        if (mode === "pvs") pvsNonAutoPredict()
+        if (mode === "pvs") pvsComplexPredict()
         else if (mode === "pcs") pcsPredict()
-    }, [mode, pvsNonAutoPredict, pcsPredict])
+    }, [mode, pvsComplexPredict, pcsPredict])
 
     useKeyPress("Enter", handleEnter)
 
@@ -262,8 +260,8 @@ function RouteComponent() {
 
                         if (mode == "pvs") {
                             const [x, y] = roundAndClampCoords(info.coordinate!)
-                            if (pvsAutoMode) {
-                                // On auto mode, call predict straight away
+                            if (pvsSimpleMode) {
+                                // In simple mode, call predict straight away
                                 pvsMutation.mutate({
                                     bbox: null,
                                     points: [{ x, y, label: true }],
@@ -323,8 +321,8 @@ function RouteComponent() {
                             event.stopImmediatePropagation()
 
                             if (mode == "pvs") {
-                                if (pvsAutoMode) {
-                                    // In auto mode, call the prediction straight away
+                                if (pvsSimpleMode) {
+                                    // In simple mode, call the prediction straight away
                                     pvsMutation.mutate(
                                         {
                                             bbox: getBBoxPrompt(pvsBoxCorners),
@@ -338,7 +336,7 @@ function RouteComponent() {
                                         },
                                     )
                                 } else {
-                                    // In non auto mode, set the bbox prompt
+                                    // In non simple mode, set the bbox prompt
                                     setPvsBboxPrompt(
                                         getBBoxPrompt(pvsBoxCorners),
                                     )
@@ -369,17 +367,32 @@ function RouteComponent() {
                 {mode == "pvs" && (
                     <>
                         <div className="flex gap-3">
-                            <Label htmlFor="pvs-complex-mode">Auto Mode</Label>
+                            <Label htmlFor="pvs-complex-mode">
+                                Simple Mode
+                            </Label>
                             <Switch
                                 id="pvs-complex-mode"
-                                checked={pvsAutoMode}
-                                onCheckedChange={(b) => setPvsAutoMode(b)}
+                                checked={pvsSimpleMode}
+                                onCheckedChange={(b) => setPvsSimpleMode(b)}
                             ></Switch>
                         </div>
-                        {!pvsAutoMode && (
+
+                        {pvsSimpleMode ? (
+                            <Button
+                                onClick={() => {
+                                    pvsMutation.mutate(null, {
+                                        onSettled: () =>
+                                            setHasAutoSegmented(true),
+                                    })
+                                }}
+                                disabled={hasAutoSegmented}
+                            >
+                                Auto Segment
+                            </Button>
+                        ) : (
                             <div className="flex gap-2">
                                 <Button
-                                    onClick={pvsNonAutoPredict}
+                                    onClick={pvsComplexPredict}
                                     disabled={!isPvsPrompts}
                                     variant="outline"
                                     size="lg"

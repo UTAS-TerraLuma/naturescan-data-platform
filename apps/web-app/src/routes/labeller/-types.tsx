@@ -55,21 +55,23 @@ export type Result = z.infer<typeof resultSchema>
 
 const pvsPromptSechma = z.object({
     mode: z.literal("pvs"),
-    prompt: z.object({
-        bbox: z
-            .object({
-                xmin: z.number(),
-                ymin: z.number(),
-                xmax: z.number(),
-                ymax: z.number(),
-            })
-            .nullable()
-            .optional(),
+    prompt: z
+        .object({
+            bbox: z
+                .object({
+                    xmin: z.number(),
+                    ymin: z.number(),
+                    xmax: z.number(),
+                    ymax: z.number(),
+                })
+                .nullable()
+                .optional(),
 
-        points: z.array(
-            z.object({ x: z.number(), y: z.number(), label: z.boolean() }),
-        ),
-    }),
+            points: z.array(
+                z.object({ x: z.number(), y: z.number(), label: z.boolean() }),
+            ),
+        })
+        .nullable(),
 })
 
 const pcsPromptSchema = z.object({

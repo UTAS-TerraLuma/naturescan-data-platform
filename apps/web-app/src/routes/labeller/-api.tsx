@@ -18,7 +18,7 @@ export async function setImage(imageUrl: string): Promise<void> {
 }
 
 export async function predictPVS(
-    prompt: VisualPrompt,
+    prompt: VisualPrompt | null = null,
 ): Promise<PredictionResults> {
     const body = { prompt }
 
@@ -29,6 +29,7 @@ export async function predictPVS(
     })
     if (!res.ok) throw new Error(`pvs failed: ${res.status}`)
     const json = await res.json()
+    console.log(json)
     return predictionResultsSchema.parse(json)
 }
 
@@ -44,6 +45,5 @@ export async function predictPCS(
     })
     if (!res.ok) throw new Error(`pcs failed: ${res.status}`)
     const json = await res.json()
-    console.log(json)
     return predictionResultsSchema.parse(json)
 }
