@@ -10,7 +10,9 @@ import {
     labellerSearchSchema,
     type BBoxPrompt,
     type BoxCorners,
+    type ImageExemplarPrompt,
     type PointPrompt,
+    type PCSResult,
     type PromptMode,
     type PVSResult,
 } from "./-types"
@@ -22,6 +24,7 @@ import { getBBoxPrompt, roundAndClampCoords } from "./-utils"
 import { useKeyPress } from "@/hooks/useKeyPress"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Trash2 } from "lucide-react"
 
 // ---- Constants ----
@@ -87,17 +90,69 @@ function RouteComponent() {
         onSettled: clearPvsState,
     })
 
-    const pvsNonAutoPredict = () => {
-        // Only call when in PVS mode and note in auto mode
+    const pvsNonAutoPredict = useCallback(() => {
+        // Only call when in PVS mode and not in auto mode
         if (!(mode == "pvs" && !pvsAutoMode)) return
 
         pvsMutation.mutate({
             bbox: pvsBboxPrompt,
             points: pvsPoints,
         })
-    }
+    }, [mode, pvsAutoMode, pvsBboxPrompt, pvsPoints, pvsMutation])
 
     // ---- PCS State ----
+    const [pcsBoxCorners, setPcsBoxCorners] =
+        useState<BoxCorners>(EMPTY_BOX_CORNERS)
+    const [pcsExemplars, setPcsExemplars] = useState<ImageExemplarPrompt[]>([])
+    const [pcsNounPhrase, setPcsNounPhrase] = useState("")
+    const isPcsPrompts =
+        pcsExemplars.length > 0 || pcsNounPhrase.trim().length > 0
+
+    const clearPcsState = () => {
+        setPcsBoxCorners(EMPTY_BOX_CORNERS)
+        setPcsExemplars([])
+        setPcsNounPhrase("")
+    }
+
+    const [pcsResults, setPcsResults] = useState<PCSResult[]>([])
+
+    const pcsMutation = useMutation({
+        mutationFn: predictPCS,
+        onSuccess: (result) => (
+            console.log(result),
+            setPcsResults((r) => [...r, result])
+        ),
+        onError: (err) => console.error("PCS error:", err),
+        onSettled: clearPcsState,
+    })
+
+    const pcsPredict = useCallback(() => {
+        if (mode !== "pcs") return
+        pcsMutation.mutate({
+            nounPhrase: pcsNounPhrase,
+            imageExemplars: pcsExemplars,
+        })
+    }, [mode, pcsNounPhrase, pcsExemplars, pcsMutation])
+
+    // --- Keyboard Handling ----
+
+    const [isShiftPressed, setIsShiftPressed] = useState(false)
+
+    useKeyPress(
+        "Shift",
+        () => setIsShiftPressed(true),
+        () => setIsShiftPressed(false),
+    )
+
+    // useKeyPress("v", () => setMode("pvs"))
+    // useKeyPress("c", () => setMode("pcs"))
+    // useKeyPress("a", () => setPvsAutoMode((b) => !b))
+    const handleEnter = useCallback(() => {
+        if (mode === "pvs") pvsNonAutoPredict()
+        else if (mode === "pcs") pcsPredict()
+    }, [mode, pvsNonAutoPredict, pcsPredict])
+
+    useKeyPress("Enter", handleEnter)
 
     // --- DeckGL Layers ---
     const imageLayer = new BitmapLayer({
@@ -138,6 +193,57 @@ function RouteComponent() {
         getFillColor: (d) => (d.label ? [0, 255, 0] : [255, 0, 0]),
     })
 
+    const pcsBoxLayer = new PolygonLayer<BoxCorners>({
+        id: "pcs-bbox",
+        data: [pcsBoxCorners],
+        getPolygon: (d) => {
+            const [[x1, y1], [x2, y2]] = d
+            return [
+                [x1, y1],
+                [x2, y1],
+                [x2, y2],
+                [x1, y2],
+                [x1, y1],
+            ]
+        },
+        filled: true,
+        getFillColor: isShiftPressed ? [255, 0, 0, 50] : [0, 255, 0, 50],
+        stroked: true,
+        getLineColor: isShiftPressed ? [255, 0, 0] : [0, 255, 0],
+        visible: mode === "pcs" && pcsBoxCorners !== EMPTY_BOX_CORNERS,
+    })
+
+    const pcsExemplarsLayer = new PolygonLayer<ImageExemplarPrompt>({
+        id: "pcs-exemplars",
+        data: pcsExemplars,
+        getPolygon: (d) => [
+            [d.xmin, d.ymin],
+            [d.xmax, d.ymin],
+            [d.xmax, d.ymax],
+            [d.xmin, d.ymax],
+            [d.xmin, d.ymin],
+        ],
+        filled: true,
+        getFillColor: (d) => (d.label ? [0, 255, 0, 50] : [255, 0, 0, 50]),
+        stroked: true,
+        getLineColor: (d) => (d.label ? [0, 255, 0] : [255, 0, 0]),
+        visible: mode === "pcs",
+    })
+
+    const pcsResultsLayer = new PolygonLayer<{ x: number[]; y: number[] }>({
+        id: "pcs-results-layer",
+        data: pcsResults.flatMap((r) => r.results.flat().map((item) => item.segments)),
+        getPolygon: (d) => {
+            const coords = d.x.map((x, i) => [x, d.y[i]])
+            coords.push([d.x[0], d.y[0]])
+            return coords
+        },
+        filled: true,
+        getFillColor: [0, 0, 255, 50],
+        stroked: true,
+        getLineColor: [0, 0, 255],
+    })
+
     const pvsResultsLayer = new PolygonLayer<PVSResult>({
         id: "pvs-results-layer",
         data: pvsResults,
@@ -155,21 +261,6 @@ function RouteComponent() {
         getLineColor: [0, 0, 255],
     })
 
-    // --- shift button ----
-
-    const [isShiftPressed, setIsShiftPressed] = useState(false)
-
-    useKeyPress(
-        "Shift",
-        () => setIsShiftPressed(true),
-        () => setIsShiftPressed(false),
-    )
-
-    // useKeyPress("v", () => setMode("pvs"))
-    // useKeyPress("c", () => setMode("pcs"))
-    // useKeyPress("a", () => setPvsAutoMode((b) => !b))
-    useKeyPress("Enter", pvsNonAutoPredict)
-
     return (
         <FullscreenLayout className="bg-neutral-200">
             <div onContextMenu={(e) => e.preventDefault()}>
@@ -181,6 +272,9 @@ function RouteComponent() {
                         pvsBoxLayer,
                         pvsResultsLayer,
                         pvsPointsLayer,
+                        pcsResultsLayer,
+                        pcsExemplarsLayer,
+                        pcsBoxLayer,
                     ]}
                     controller={{
                         dragPan: true,
@@ -219,7 +313,11 @@ function RouteComponent() {
                                     [x, y],
                                 ])
                             } else if (mode == "pcs") {
-                                console.log(event)
+                                const [x, y] = info.coordinate!
+                                setPcsBoxCorners([
+                                    [x, y],
+                                    [x, y],
+                                ])
                             }
                         }
                     }}
@@ -234,7 +332,8 @@ function RouteComponent() {
                                 const [x, y] = info.coordinate!
                                 setPvsBoxCorners((b) => [b[0], [x, y]])
                             } else if (mode == "pcs") {
-                                console.log(event)
+                                const [x, y] = info.coordinate!
+                                setPcsBoxCorners((b) => [b[0], [x, y]])
                             }
                         }
                     }}
@@ -267,6 +366,13 @@ function RouteComponent() {
                                         getBBoxPrompt(pvsBoxCorners),
                                     )
                                 }
+                            } else if (mode == "pcs") {
+                                const exemplar: ImageExemplarPrompt = {
+                                    ...getBBoxPrompt(pcsBoxCorners),
+                                    label: !isShiftPressed,
+                                }
+                                setPcsExemplars((e) => [...e, exemplar])
+                                setPcsBoxCorners(EMPTY_BOX_CORNERS)
                             }
                         }
                     }}
@@ -314,6 +420,41 @@ function RouteComponent() {
                                 </Button>
                             </div>
                         )}
+                    </>
+                )}
+                {mode === "pcs" && (
+                    <>
+                        <div className="flex gap-3 items-center">
+                            <Label htmlFor="pcs-noun-phrase">Noun Phrase</Label>
+                            <Input
+                                id="pcs-noun-phrase"
+                                value={pcsNounPhrase}
+                                onChange={(e) =>
+                                    setPcsNounPhrase(e.target.value)
+                                }
+                                placeholder="e.g. red car"
+                                className="w-40"
+                            />
+                        </div>
+                        <div className="flex gap-2">
+                            <Button
+                                onClick={pcsPredict}
+                                disabled={!isPcsPrompts}
+                                variant="outline"
+                                size="lg"
+                            >
+                                Predict
+                                <Kbd>⏎</Kbd>
+                            </Button>
+                            <Button
+                                onClick={clearPcsState}
+                                disabled={!isPcsPrompts}
+                                variant="ghost"
+                                size="lg"
+                            >
+                                Clear
+                            </Button>
+                        </div>
                     </>
                 )}
             </div>
