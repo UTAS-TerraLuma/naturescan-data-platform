@@ -12,9 +12,9 @@ import {
     type BoxCorners,
     type ImageExemplarPrompt,
     type PointPrompt,
-    type PCSResult,
+    type PredictionResult,
+    type PredictionResults,
     type PromptMode,
-    type PVSResult,
 } from "./-types"
 import { ImageStatusIndicator } from "./-components/ImageStatusIndicator"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -25,7 +25,6 @@ import { useKeyPress } from "@/hooks/useKeyPress"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Trash2 } from "lucide-react"
 
 // ---- Constants ----
 export const IMAGE_SIZE = 1036
@@ -63,6 +62,10 @@ function RouteComponent() {
     const [mode, setMode] = useState<PromptMode>("pvs")
     const [pvsAutoMode, setPvsAutoMode] = useState(true)
 
+    // ---- Prediction Mutations
+    const [predictionResults, setPredictionResults] =
+        useState<PredictionResults>([])
+
     // ---- PVS Prompt State ----
     const [pvsBoxCorners, setPvsBoxCorners] =
         useState<BoxCorners>(EMPTY_BOX_CORNERS)
@@ -77,15 +80,11 @@ function RouteComponent() {
         setPvsPoints([])
     }
 
-    // ---- Prediction Mutations
-    const [pvsResults, setPvsResults] = useState<PVSResult[]>([])
-
+    // ---- PVS Mutations ----
     const pvsMutation = useMutation({
         mutationFn: predictPVS,
-        onSuccess: (result: PVSResult) => (
-            console.log(result),
-            setPvsResults((r) => [...r, result])
-        ),
+        onSuccess: (result: PredictionResults) =>
+            setPredictionResults((r) => [...r, ...result]),
         onError: (err) => console.error("PVS error:", err),
         onSettled: clearPvsState,
     })
@@ -114,14 +113,9 @@ function RouteComponent() {
         setPcsNounPhrase("")
     }
 
-    const [pcsResults, setPcsResults] = useState<PCSResult[]>([])
-
     const pcsMutation = useMutation({
         mutationFn: predictPCS,
-        onSuccess: (result) => (
-            console.log(result),
-            setPcsResults((r) => [...r, result])
-        ),
+        onSuccess: (results) => setPredictionResults((r) => [...r, ...results]),
         onError: (err) => console.error("PCS error:", err),
         onSettled: clearPcsState,
     })
@@ -230,29 +224,13 @@ function RouteComponent() {
         visible: mode === "pcs",
     })
 
-    const pcsResultsLayer = new PolygonLayer<{ x: number[]; y: number[] }>({
-        id: "pcs-results-layer",
-        data: pcsResults.flatMap((r) => r.results.flat().map((item) => item.segments)),
+    const predictionResultsLayer = new PolygonLayer<PredictionResult>({
+        id: "prediction-results-layer",
+        data: predictionResults,
         getPolygon: (d) => {
-            const coords = d.x.map((x, i) => [x, d.y[i]])
-            coords.push([d.x[0], d.y[0]])
-            return coords
-        },
-        filled: true,
-        getFillColor: [0, 0, 255, 50],
-        stroked: true,
-        getLineColor: [0, 0, 255],
-    })
-
-    const pvsResultsLayer = new PolygonLayer<PVSResult>({
-        id: "pvs-results-layer",
-        data: pvsResults,
-        getPolygon: (d) => {
-            const segments = d.results[0][0].segments
-
-            let coords = segments.x.map((x, i) => [x, segments.y[i]])
+            const segments = d.result.segments
+            const coords = segments.x.map((x, i) => [x, segments.y[i]])
             coords.push([segments.x[0], segments.y[0]])
-
             return coords
         },
         filled: true,
@@ -270,11 +248,10 @@ function RouteComponent() {
                     layers={[
                         imageLayer,
                         pvsBoxLayer,
-                        pvsResultsLayer,
                         pvsPointsLayer,
-                        pcsResultsLayer,
                         pcsExemplarsLayer,
                         pcsBoxLayer,
+                        predictionResultsLayer,
                     ]}
                     controller={{
                         dragPan: true,

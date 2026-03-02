@@ -1,10 +1,8 @@
-import type { ConceptPrompt } from "@/lib/segment"
 import {
-    pvsResultsSchema,
-    type PVSResult,
-    pcsResultsSchema,
-    type PCSResult,
+    predictionResultsSchema,
+    type PredictionResults,
     type VisualPrompt,
+    type ConceptPrompt,
 } from "./-types"
 
 const API_URL = import.meta.env.VITE_SEGMENTATION_API
@@ -19,8 +17,10 @@ export async function setImage(imageUrl: string): Promise<void> {
     if (!res.ok) throw new Error(`set-image failed: ${res.status}`)
 }
 
-export async function predictPVS(prompt: VisualPrompt): Promise<PVSResult> {
-    const body = { prompts: [prompt] }
+export async function predictPVS(
+    prompt: VisualPrompt,
+): Promise<PredictionResults> {
+    const body = { prompt }
 
     const res = await fetch(`${API_URL}/pvs`, {
         method: "POST",
@@ -28,12 +28,13 @@ export async function predictPVS(prompt: VisualPrompt): Promise<PVSResult> {
         body: JSON.stringify(body),
     })
     if (!res.ok) throw new Error(`pvs failed: ${res.status}`)
-
     const json = await res.json()
-    return pvsResultsSchema.parse(json)
+    return predictionResultsSchema.parse(json)
 }
 
-export async function predictPCS(prompt: ConceptPrompt): Promise<PCSResult> {
+export async function predictPCS(
+    prompt: ConceptPrompt,
+): Promise<PredictionResults> {
     const body = { prompt }
 
     const res = await fetch(`${API_URL}/pcs`, {
@@ -42,7 +43,7 @@ export async function predictPCS(prompt: ConceptPrompt): Promise<PCSResult> {
         body: JSON.stringify(body),
     })
     if (!res.ok) throw new Error(`pcs failed: ${res.status}`)
-
     const json = await res.json()
-    return pcsResultsSchema.parse(json)
+    console.log(json)
+    return predictionResultsSchema.parse(json)
 }
