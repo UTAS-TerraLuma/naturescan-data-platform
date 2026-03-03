@@ -12,6 +12,7 @@ import {
     type BoxCorners,
     type PointPrompt,
     type PredictionResult,
+    type Prompt,
     type PromptMode,
 } from "./-types"
 import { ImageStatusIndicator } from "./-components/ImageStatusIndicator"
@@ -103,7 +104,7 @@ function RouteComponent() {
 
     // ---- Predict Mutations ----
     const predictMutation = useMutation({
-        mutationFn: predict,
+        mutationFn: (prompt: Prompt | null = null) => predict(imageUrl, prompt),
         onSuccess: addResults,
         onError: (err) => console.error("PVS error:", err),
         onSettled: clearPromptState,

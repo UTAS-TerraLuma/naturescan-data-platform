@@ -82,7 +82,7 @@ export const useDeck = create<DeckStore>()(
             },
 
             layers: [],
-            updateLayer: (layer) =>
+            updateLayer: (layer) => {
                 set((state) => {
                     // Check if layer already exists
                     const existingIndex = state.layers.findIndex(
@@ -97,7 +97,10 @@ export const useDeck = create<DeckStore>()(
                     } else {
                         return { layers: [...state.layers, layer] }
                     }
-                }),
+                })
+
+                return () => get().removeLayer(layer.id)
+            },
 
             removeLayer: (id) =>
                 set((state) => ({

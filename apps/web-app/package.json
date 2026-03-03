@@ -20,6 +20,7 @@
         "@developmentseed/deck.gl-geotiff": "^0.1.0",
         "@fontsource-variable/inter": "^5.2.8",
         "@math.gl/proj4": "^4.1.0",
+        "@math.gl/web-mercator": "^4.1.0",
         "@tailwindcss/vite": "^4.0.6",
         "@tanstack/react-devtools": "^0.7.0",
         "@tanstack/react-query": "^5.90.16",
