@@ -5,15 +5,13 @@ import DeckGL from "@deck.gl/react"
 import { useMutation } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { useCallback, useEffect, useState } from "react"
-import { predictPCS, predictPVS, setImage } from "./-api"
+import { predict, setImage } from "./-api"
 import {
     labellerSearchSchema,
     type BBoxPrompt,
     type BoxCorners,
-    type ImageExemplarPrompt,
     type PointPrompt,
     type PredictionResult,
-    type PredictionResults,
     type PromptMode,
 } from "./-types"
 import { ImageStatusIndicator } from "./-components/ImageStatusIndicator"
@@ -64,9 +62,10 @@ function RouteComponent() {
     const [hasAutoSegmented, setHasAutoSegmented] = useState(false)
 
     // ---- Prediction Mutations
-    const [predictionResults, setPredictionResults] =
-        useState<PredictionResults>([])
-    const addResults = (newResults: PredictionResults) =>
+    const [predictionResults, setPredictionResults] = useState<
+        PredictionResult[]
+    >([])
+    const addResults = (newResults: PredictionResult[]) =>
         setPredictionResults((oldResults) => [...oldResults, ...newResults])
     const removeResults = (id: string | string[]) =>
         setPredictionResults((results) =>
@@ -83,62 +82,54 @@ function RouteComponent() {
     const [pvsBboxPrompt, setPvsBboxPrompt] = useState<BBoxPrompt | null>(null)
     const [pvsPoints, setPvsPoints] = useState<PointPrompt[]>([])
     const isPvsPrompts = pvsPoints.length > 0 || pvsBboxPrompt != null
-    const clearPvsState = () => {
+
+    // ---- PCS Prompt State ----
+    const [pcsBoxCorners, setPcsBoxCorners] =
+        useState<BoxCorners>(EMPTY_BOX_CORNERS)
+    const [pcsExemplars, setPcsExemplars] = useState<BBoxPrompt[]>([])
+    const [pcsNounPhrase, setPcsNounPhrase] = useState("")
+    const isPcsPrompts =
+        pcsExemplars.length > 0 || pcsNounPhrase.trim().length > 0
+
+    const clearPromptState = () => {
         // Rest all prompt state holders
         setPvsBoxCorners(EMPTY_BOX_CORNERS)
         setPvsBboxPrompt(null)
         setPvsPoints([])
+        setPcsBoxCorners(EMPTY_BOX_CORNERS)
+        setPcsExemplars([])
+        setPcsNounPhrase("")
     }
 
-    // ---- PVS Mutations ----
-    const pvsMutation = useMutation({
-        mutationFn: predictPVS,
+    // ---- Predict Mutations ----
+    const predictMutation = useMutation({
+        mutationFn: predict,
         onSuccess: addResults,
         onError: (err) => console.error("PVS error:", err),
-        onSettled: clearPvsState,
+        onSettled: clearPromptState,
     })
 
     const pvsComplexPredict = useCallback(() => {
         // Only call when in PVS mode and not in simple mode
         if (!(mode == "pvs" && !pvsSimpleMode)) return
 
-        pvsMutation.mutate({
+        predictMutation.mutate({
+            type: "visual",
             bbox: pvsBboxPrompt,
             points: pvsPoints,
         })
-    }, [mode, pvsSimpleMode, pvsBboxPrompt, pvsPoints, pvsMutation])
-
-    // ---- PCS State ----
-    const [pcsBoxCorners, setPcsBoxCorners] =
-        useState<BoxCorners>(EMPTY_BOX_CORNERS)
-    const [pcsExemplars, setPcsExemplars] = useState<ImageExemplarPrompt[]>([])
-    const [pcsNounPhrase, setPcsNounPhrase] = useState("")
-    const isPcsPrompts =
-        pcsExemplars.length > 0 || pcsNounPhrase.trim().length > 0
-
-    const clearPcsState = () => {
-        setPcsBoxCorners(EMPTY_BOX_CORNERS)
-        setPcsExemplars([])
-        setPcsNounPhrase("")
-    }
-
-    const pcsMutation = useMutation({
-        mutationFn: predictPCS,
-        onSuccess: addResults,
-        onError: (err) => console.error("PCS error:", err),
-        onSettled: clearPcsState,
-    })
+    }, [mode, pvsSimpleMode, pvsBboxPrompt, pvsPoints, predictMutation])
 
     const pcsPredict = useCallback(() => {
         if (mode !== "pcs") return
-        pcsMutation.mutate({
-            nounPhrase: pcsNounPhrase,
-            imageExemplars: pcsExemplars,
+        predictMutation.mutate({
+            type: "concept",
+            text: pcsNounPhrase,
+            exemplars: pcsExemplars,
         })
-    }, [mode, pcsNounPhrase, pcsExemplars, pcsMutation])
+    }, [mode, pcsNounPhrase, pcsExemplars, predictMutation])
 
     // --- Keyboard Handling ----
-
     const [isShiftPressed, setIsShiftPressed] = useState(false)
 
     useKeyPress(
@@ -218,7 +209,7 @@ function RouteComponent() {
         visible: mode === "pcs" && pcsBoxCorners !== EMPTY_BOX_CORNERS,
     })
 
-    const pcsExemplarsLayer = new PolygonLayer<ImageExemplarPrompt>({
+    const pcsExemplarsLayer = new PolygonLayer<BBoxPrompt>({
         id: "pcs-exemplars",
         data: pcsExemplars,
         getPolygon: (d) => [
@@ -292,7 +283,8 @@ function RouteComponent() {
                             const [x, y] = roundAndClampCoords(info.coordinate!)
                             if (pvsSimpleMode) {
                                 // In simple mode, call predict straight away
-                                pvsMutation.mutate({
+                                predictMutation.mutate({
+                                    type: "visual",
                                     bbox: null,
                                     points: [{ x, y, label: true }],
                                 })
@@ -353,18 +345,11 @@ function RouteComponent() {
                             if (mode == "pvs") {
                                 if (pvsSimpleMode) {
                                     // In simple mode, call the prediction straight away
-                                    pvsMutation.mutate(
-                                        {
-                                            bbox: getBBoxPrompt(pvsBoxCorners),
-                                            points: [],
-                                        },
-                                        {
-                                            onSettled: () =>
-                                                setPvsBoxCorners(
-                                                    EMPTY_BOX_CORNERS,
-                                                ),
-                                        },
-                                    )
+                                    predictMutation.mutate({
+                                        type: "visual",
+                                        bbox: getBBoxPrompt(pvsBoxCorners),
+                                        points: [],
+                                    })
                                 } else {
                                     // In non simple mode, set the bbox prompt
                                     setPvsBboxPrompt(
@@ -372,7 +357,7 @@ function RouteComponent() {
                                     )
                                 }
                             } else if (mode == "pcs") {
-                                const exemplar: ImageExemplarPrompt = {
+                                const exemplar: BBoxPrompt = {
                                     ...getBBoxPrompt(pcsBoxCorners),
                                     label: !isShiftPressed,
                                 }
@@ -410,7 +395,7 @@ function RouteComponent() {
                         {pvsSimpleMode ? (
                             <Button
                                 onClick={() => {
-                                    pvsMutation.mutate(null, {
+                                    predictMutation.mutate(null, {
                                         onSettled: () =>
                                             setHasAutoSegmented(true),
                                     })
@@ -431,7 +416,7 @@ function RouteComponent() {
                                     <Kbd>⏎</Kbd>
                                 </Button>
                                 <Button
-                                    onClick={clearPvsState}
+                                    onClick={clearPromptState}
                                     disabled={!isPvsPrompts}
                                     variant="ghost"
                                     size="lg"
@@ -467,7 +452,7 @@ function RouteComponent() {
                                 <Kbd>⏎</Kbd>
                             </Button>
                             <Button
-                                onClick={clearPcsState}
+                                onClick={clearPromptState}
                                 disabled={!isPcsPrompts}
                                 variant="ghost"
                                 size="lg"

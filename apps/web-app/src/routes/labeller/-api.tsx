@@ -1,6 +1,6 @@
 import {
     predictionResultsSchema,
-    type PredictionResults,
+    type PredictionResult,
     type VisualPrompt,
     type ConceptPrompt,
 } from "./-types"
@@ -17,33 +17,48 @@ export async function setImage(imageUrl: string): Promise<void> {
     if (!res.ok) throw new Error(`set-image failed: ${res.status}`)
 }
 
-export async function predictPVS(
-    prompt: VisualPrompt | null = null,
-): Promise<PredictionResults> {
+export async function predict(
+    prompt: VisualPrompt | ConceptPrompt | null,
+): Promise<PredictionResult[]> {
     const body = { prompt }
 
-    const res = await fetch(`${API_URL}/pvs`, {
+    const res = await fetch(`${API_URL}/predict`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
     })
     if (!res.ok) throw new Error(`pvs failed: ${res.status}`)
     const json = await res.json()
-    console.log(json)
     return predictionResultsSchema.parse(json)
 }
 
-export async function predictPCS(
-    prompt: ConceptPrompt,
-): Promise<PredictionResults> {
-    const body = { prompt }
+// export async function predictPVS(
+//     prompt: VisualPrompt | null = null,
+// ): Promise<PredictionResults> {
+//     const body = { prompt }
 
-    const res = await fetch(`${API_URL}/pcs`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-    })
-    if (!res.ok) throw new Error(`pcs failed: ${res.status}`)
-    const json = await res.json()
-    return predictionResultsSchema.parse(json)
-}
+//     const res = await fetch(`${API_URL}/pvs`, {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(body),
+//     })
+//     if (!res.ok) throw new Error(`pvs failed: ${res.status}`)
+//     const json = await res.json()
+//     console.log(json)
+//     return predictionResultsSchema.parse(json)
+// }
+
+// export async function predictPCS(
+//     prompt: ConceptPrompt,
+// ): Promise<PredictionResults> {
+//     const body = { prompt }
+
+//     const res = await fetch(`${API_URL}/pcs`, {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(body),
+//     })
+//     if (!res.ok) throw new Error(`pcs failed: ${res.status}`)
+//     const json = await res.json()
+//     return predictionResultsSchema.parse(json)
+// }

@@ -12,20 +12,19 @@ export interface BBoxPrompt {
     ymin: number
     xmax: number
     ymax: number
+    label?: boolean
 }
 
 export interface VisualPrompt {
+    type: "visual"
     bbox: BBoxPrompt | null
     points: PointPrompt[]
 }
 
-export interface ImageExemplarPrompt extends BBoxPrompt {
-    label: boolean
-}
-
 export interface ConceptPrompt {
-    nounPhrase: string
-    imageExemplars: ImageExemplarPrompt[]
+    type: "concept"
+    text: string
+    exemplars: BBoxPrompt[]
 }
 
 export type PromptMode = "pcs" | "pvs"
@@ -37,8 +36,6 @@ export const labellerSearchSchema = z.object({
 
 // ---- Results ----
 export const resultSchema = z.object({
-    name: z.string(),
-    class: z.any(),
     confidence: z.number(),
     box: z.object({
         x1: z.number(),
@@ -51,54 +48,44 @@ export const resultSchema = z.object({
 export type Result = z.infer<typeof resultSchema>
 
 const pvsPromptSechma = z.object({
-    mode: z.literal("pvs"),
-    prompt: z
+    bbox: z
         .object({
-            bbox: z
-                .object({
-                    xmin: z.number(),
-                    ymin: z.number(),
-                    xmax: z.number(),
-                    ymax: z.number(),
-                })
-                .nullable()
-                .optional(),
-
-            points: z.array(
-                z.object({ x: z.number(), y: z.number(), label: z.boolean() }),
-            ),
+            xmin: z.number(),
+            ymin: z.number(),
+            xmax: z.number(),
+            ymax: z.number(),
         })
-        .nullable(),
+        .nullable()
+        .optional(),
+
+    points: z.array(
+        z.object({ x: z.number(), y: z.number(), label: z.boolean() }),
+    ),
 })
 
 const pcsPromptSchema = z.object({
-    mode: z.literal("pcs"),
-    prompt: z.object({
-        nounPhrase: z.string().nullable().optional(),
-        imageExemplars: z.array(
-            z.object({
-                xmin: z.number(),
-                ymin: z.number(),
-                xmax: z.number(),
-                ymax: z.number(),
-                label: z.boolean(),
-            }),
-        ),
-    }),
+    text: z.string().nullable().optional(),
+    exemplars: z.array(
+        z.object({
+            xmin: z.number(),
+            ymin: z.number(),
+            xmax: z.number(),
+            ymax: z.number(),
+            label: z.boolean(),
+        }),
+    ),
 })
 
 export const predictionResultsSchema = z.array(
     z.object({
         id: z.string(),
-        imageURL: z.url(),
-        prompt: z.union([pvsPromptSechma, pcsPromptSchema]),
+        image_url: z.url(),
+        prompt: z.union([pvsPromptSechma, pcsPromptSchema]).nullable(),
         result: resultSchema,
     }),
 )
 
-export type PredictionResults = z.infer<typeof predictionResultsSchema>
-
-export type PredictionResult = PredictionResults[number]
+export type PredictionResult = z.infer<typeof predictionResultsSchema>[number]
 
 // --- Component ----
 

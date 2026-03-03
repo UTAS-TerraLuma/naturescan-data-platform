@@ -14,7 +14,6 @@ import { Route as LabellerRouteRouteImport } from './routes/labeller/route'
 import { Route as ExplorerRouteRouteImport } from './routes/explorer.route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExplorerIndexRouteImport } from './routes/explorer.index'
-import { Route as LabellerOldrouteRouteImport } from './routes/labeller/oldroute'
 import { Route as ExplorerCollectionIdRouteRouteImport } from './routes/explorer.$collectionId.route'
 import { Route as ExplorerCollectionIdIndexRouteImport } from './routes/explorer.$collectionId.index'
 import { Route as ExplorerCollectionIdItemIdRouteRouteImport } from './routes/explorer.$collectionId.$itemId.route'
@@ -45,11 +44,6 @@ const ExplorerIndexRoute = ExplorerIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ExplorerRouteRoute,
 } as any)
-const LabellerOldrouteRoute = LabellerOldrouteRouteImport.update({
-  id: '/oldroute',
-  path: '/oldroute',
-  getParentRoute: () => LabellerRouteRoute,
-} as any)
 const ExplorerCollectionIdRouteRoute =
   ExplorerCollectionIdRouteRouteImport.update({
     id: '/$collectionId',
@@ -78,10 +72,9 @@ const ExplorerCollectionIdItemIdLabelRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/explorer': typeof ExplorerRouteRouteWithChildren
-  '/labeller': typeof LabellerRouteRouteWithChildren
+  '/labeller': typeof LabellerRouteRoute
   '/component-example': typeof ComponentExampleRoute
   '/explorer/$collectionId': typeof ExplorerCollectionIdRouteRouteWithChildren
-  '/labeller/oldroute': typeof LabellerOldrouteRoute
   '/explorer/': typeof ExplorerIndexRoute
   '/explorer/$collectionId/$itemId': typeof ExplorerCollectionIdItemIdRouteRouteWithChildren
   '/explorer/$collectionId/': typeof ExplorerCollectionIdIndexRoute
@@ -89,9 +82,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/labeller': typeof LabellerRouteRouteWithChildren
+  '/labeller': typeof LabellerRouteRoute
   '/component-example': typeof ComponentExampleRoute
-  '/labeller/oldroute': typeof LabellerOldrouteRoute
   '/explorer': typeof ExplorerIndexRoute
   '/explorer/$collectionId/$itemId': typeof ExplorerCollectionIdItemIdRouteRouteWithChildren
   '/explorer/$collectionId': typeof ExplorerCollectionIdIndexRoute
@@ -101,10 +93,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/explorer': typeof ExplorerRouteRouteWithChildren
-  '/labeller': typeof LabellerRouteRouteWithChildren
+  '/labeller': typeof LabellerRouteRoute
   '/component-example': typeof ComponentExampleRoute
   '/explorer/$collectionId': typeof ExplorerCollectionIdRouteRouteWithChildren
-  '/labeller/oldroute': typeof LabellerOldrouteRoute
   '/explorer/': typeof ExplorerIndexRoute
   '/explorer/$collectionId/$itemId': typeof ExplorerCollectionIdItemIdRouteRouteWithChildren
   '/explorer/$collectionId/': typeof ExplorerCollectionIdIndexRoute
@@ -118,7 +109,6 @@ export interface FileRouteTypes {
     | '/labeller'
     | '/component-example'
     | '/explorer/$collectionId'
-    | '/labeller/oldroute'
     | '/explorer/'
     | '/explorer/$collectionId/$itemId'
     | '/explorer/$collectionId/'
@@ -128,7 +118,6 @@ export interface FileRouteTypes {
     | '/'
     | '/labeller'
     | '/component-example'
-    | '/labeller/oldroute'
     | '/explorer'
     | '/explorer/$collectionId/$itemId'
     | '/explorer/$collectionId'
@@ -140,7 +129,6 @@ export interface FileRouteTypes {
     | '/labeller'
     | '/component-example'
     | '/explorer/$collectionId'
-    | '/labeller/oldroute'
     | '/explorer/'
     | '/explorer/$collectionId/$itemId'
     | '/explorer/$collectionId/'
@@ -150,7 +138,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ExplorerRouteRoute: typeof ExplorerRouteRouteWithChildren
-  LabellerRouteRoute: typeof LabellerRouteRouteWithChildren
+  LabellerRouteRoute: typeof LabellerRouteRoute
   ComponentExampleRoute: typeof ComponentExampleRoute
 }
 
@@ -190,13 +178,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/explorer/'
       preLoaderRoute: typeof ExplorerIndexRouteImport
       parentRoute: typeof ExplorerRouteRoute
-    }
-    '/labeller/oldroute': {
-      id: '/labeller/oldroute'
-      path: '/oldroute'
-      fullPath: '/labeller/oldroute'
-      preLoaderRoute: typeof LabellerOldrouteRouteImport
-      parentRoute: typeof LabellerRouteRoute
     }
     '/explorer/$collectionId': {
       id: '/explorer/$collectionId'
@@ -274,22 +255,10 @@ const ExplorerRouteRouteWithChildren = ExplorerRouteRoute._addFileChildren(
   ExplorerRouteRouteChildren,
 )
 
-interface LabellerRouteRouteChildren {
-  LabellerOldrouteRoute: typeof LabellerOldrouteRoute
-}
-
-const LabellerRouteRouteChildren: LabellerRouteRouteChildren = {
-  LabellerOldrouteRoute: LabellerOldrouteRoute,
-}
-
-const LabellerRouteRouteWithChildren = LabellerRouteRoute._addFileChildren(
-  LabellerRouteRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ExplorerRouteRoute: ExplorerRouteRouteWithChildren,
-  LabellerRouteRoute: LabellerRouteRouteWithChildren,
+  LabellerRouteRoute: LabellerRouteRoute,
   ComponentExampleRoute: ComponentExampleRoute,
 }
 export const routeTree = rootRouteImport
