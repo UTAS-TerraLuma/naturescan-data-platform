@@ -10,10 +10,13 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ComponentExampleRouteImport } from './routes/component-example'
+import { Route as Stacv3RouteRouteImport } from './routes/stacv3/route'
 import { Route as LabellerRouteRouteImport } from './routes/labeller/route'
 import { Route as ExplorerRouteRouteImport } from './routes/explorer.route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as Stacv3IndexRouteImport } from './routes/stacv3/index'
 import { Route as ExplorerIndexRouteImport } from './routes/explorer.index'
+import { Route as Stacv3ItemIdRouteImport } from './routes/stacv3/$itemId'
 import { Route as ExplorerCollectionIdRouteRouteImport } from './routes/explorer.$collectionId.route'
 import { Route as ExplorerCollectionIdIndexRouteImport } from './routes/explorer.$collectionId.index'
 import { Route as ExplorerCollectionIdItemIdRouteRouteImport } from './routes/explorer.$collectionId.$itemId.route'
@@ -22,6 +25,11 @@ import { Route as ExplorerCollectionIdItemIdLabelRouteImport } from './routes/ex
 const ComponentExampleRoute = ComponentExampleRouteImport.update({
   id: '/component-example',
   path: '/component-example',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Stacv3RouteRoute = Stacv3RouteRouteImport.update({
+  id: '/stacv3',
+  path: '/stacv3',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LabellerRouteRoute = LabellerRouteRouteImport.update({
@@ -39,10 +47,20 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Stacv3IndexRoute = Stacv3IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => Stacv3RouteRoute,
+} as any)
 const ExplorerIndexRoute = ExplorerIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ExplorerRouteRoute,
+} as any)
+const Stacv3ItemIdRoute = Stacv3ItemIdRouteImport.update({
+  id: '/$itemId',
+  path: '/$itemId',
+  getParentRoute: () => Stacv3RouteRoute,
 } as any)
 const ExplorerCollectionIdRouteRoute =
   ExplorerCollectionIdRouteRouteImport.update({
@@ -73,9 +91,12 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/explorer': typeof ExplorerRouteRouteWithChildren
   '/labeller': typeof LabellerRouteRoute
+  '/stacv3': typeof Stacv3RouteRouteWithChildren
   '/component-example': typeof ComponentExampleRoute
   '/explorer/$collectionId': typeof ExplorerCollectionIdRouteRouteWithChildren
+  '/stacv3/$itemId': typeof Stacv3ItemIdRoute
   '/explorer/': typeof ExplorerIndexRoute
+  '/stacv3/': typeof Stacv3IndexRoute
   '/explorer/$collectionId/$itemId': typeof ExplorerCollectionIdItemIdRouteRouteWithChildren
   '/explorer/$collectionId/': typeof ExplorerCollectionIdIndexRoute
   '/explorer/$collectionId/$itemId/label': typeof ExplorerCollectionIdItemIdLabelRoute
@@ -84,7 +105,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/labeller': typeof LabellerRouteRoute
   '/component-example': typeof ComponentExampleRoute
+  '/stacv3/$itemId': typeof Stacv3ItemIdRoute
   '/explorer': typeof ExplorerIndexRoute
+  '/stacv3': typeof Stacv3IndexRoute
   '/explorer/$collectionId/$itemId': typeof ExplorerCollectionIdItemIdRouteRouteWithChildren
   '/explorer/$collectionId': typeof ExplorerCollectionIdIndexRoute
   '/explorer/$collectionId/$itemId/label': typeof ExplorerCollectionIdItemIdLabelRoute
@@ -94,9 +117,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/explorer': typeof ExplorerRouteRouteWithChildren
   '/labeller': typeof LabellerRouteRoute
+  '/stacv3': typeof Stacv3RouteRouteWithChildren
   '/component-example': typeof ComponentExampleRoute
   '/explorer/$collectionId': typeof ExplorerCollectionIdRouteRouteWithChildren
+  '/stacv3/$itemId': typeof Stacv3ItemIdRoute
   '/explorer/': typeof ExplorerIndexRoute
+  '/stacv3/': typeof Stacv3IndexRoute
   '/explorer/$collectionId/$itemId': typeof ExplorerCollectionIdItemIdRouteRouteWithChildren
   '/explorer/$collectionId/': typeof ExplorerCollectionIdIndexRoute
   '/explorer/$collectionId/$itemId/label': typeof ExplorerCollectionIdItemIdLabelRoute
@@ -107,9 +133,12 @@ export interface FileRouteTypes {
     | '/'
     | '/explorer'
     | '/labeller'
+    | '/stacv3'
     | '/component-example'
     | '/explorer/$collectionId'
+    | '/stacv3/$itemId'
     | '/explorer/'
+    | '/stacv3/'
     | '/explorer/$collectionId/$itemId'
     | '/explorer/$collectionId/'
     | '/explorer/$collectionId/$itemId/label'
@@ -118,7 +147,9 @@ export interface FileRouteTypes {
     | '/'
     | '/labeller'
     | '/component-example'
+    | '/stacv3/$itemId'
     | '/explorer'
+    | '/stacv3'
     | '/explorer/$collectionId/$itemId'
     | '/explorer/$collectionId'
     | '/explorer/$collectionId/$itemId/label'
@@ -127,9 +158,12 @@ export interface FileRouteTypes {
     | '/'
     | '/explorer'
     | '/labeller'
+    | '/stacv3'
     | '/component-example'
     | '/explorer/$collectionId'
+    | '/stacv3/$itemId'
     | '/explorer/'
+    | '/stacv3/'
     | '/explorer/$collectionId/$itemId'
     | '/explorer/$collectionId/'
     | '/explorer/$collectionId/$itemId/label'
@@ -139,6 +173,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ExplorerRouteRoute: typeof ExplorerRouteRouteWithChildren
   LabellerRouteRoute: typeof LabellerRouteRoute
+  Stacv3RouteRoute: typeof Stacv3RouteRouteWithChildren
   ComponentExampleRoute: typeof ComponentExampleRoute
 }
 
@@ -149,6 +184,13 @@ declare module '@tanstack/react-router' {
       path: '/component-example'
       fullPath: '/component-example'
       preLoaderRoute: typeof ComponentExampleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stacv3': {
+      id: '/stacv3'
+      path: '/stacv3'
+      fullPath: '/stacv3'
+      preLoaderRoute: typeof Stacv3RouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/labeller': {
@@ -172,12 +214,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/stacv3/': {
+      id: '/stacv3/'
+      path: '/'
+      fullPath: '/stacv3/'
+      preLoaderRoute: typeof Stacv3IndexRouteImport
+      parentRoute: typeof Stacv3RouteRoute
+    }
     '/explorer/': {
       id: '/explorer/'
       path: '/'
       fullPath: '/explorer/'
       preLoaderRoute: typeof ExplorerIndexRouteImport
       parentRoute: typeof ExplorerRouteRoute
+    }
+    '/stacv3/$itemId': {
+      id: '/stacv3/$itemId'
+      path: '/$itemId'
+      fullPath: '/stacv3/$itemId'
+      preLoaderRoute: typeof Stacv3ItemIdRouteImport
+      parentRoute: typeof Stacv3RouteRoute
     }
     '/explorer/$collectionId': {
       id: '/explorer/$collectionId'
@@ -255,10 +311,25 @@ const ExplorerRouteRouteWithChildren = ExplorerRouteRoute._addFileChildren(
   ExplorerRouteRouteChildren,
 )
 
+interface Stacv3RouteRouteChildren {
+  Stacv3ItemIdRoute: typeof Stacv3ItemIdRoute
+  Stacv3IndexRoute: typeof Stacv3IndexRoute
+}
+
+const Stacv3RouteRouteChildren: Stacv3RouteRouteChildren = {
+  Stacv3ItemIdRoute: Stacv3ItemIdRoute,
+  Stacv3IndexRoute: Stacv3IndexRoute,
+}
+
+const Stacv3RouteRouteWithChildren = Stacv3RouteRoute._addFileChildren(
+  Stacv3RouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ExplorerRouteRoute: ExplorerRouteRouteWithChildren,
   LabellerRouteRoute: LabellerRouteRoute,
+  Stacv3RouteRoute: Stacv3RouteRouteWithChildren,
   ComponentExampleRoute: ComponentExampleRoute,
 }
 export const routeTree = rootRouteImport
