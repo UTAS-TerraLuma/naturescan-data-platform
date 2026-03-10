@@ -7,7 +7,7 @@ import { BitmapLayer, PolygonLayer } from "@deck.gl/layers"
 import type { StacItem } from "./-stac-schema"
 import { getTilesUrl } from "@/lib/titiler"
 import { TileLayer } from "@deck.gl/geo-layers"
-import { Eye, EyeClosed } from "lucide-react"
+import { AssetCard } from "@/components/overlays/asset-card"
 
 export const Route = createFileRoute("/explorer/$itemId")({
     loader: ({ context, params: { itemId } }) =>
@@ -133,34 +133,16 @@ function RouteComponent() {
                     <h2 className="text-sm pl-2 font-medium text-foreground/75">
                         Assets
                     </h2>
-                    <div className="bg-white rounded-sm ring ring-foreground/10 p-3 relative">
-                        <button
-                            className="absolute inset-0"
-                            onClick={() => setMode("rgb")}
-                        ></button>
-                        <div className="flex justify-between">
-                            <h3>RGB Orthomosaic</h3>
-                            {mode == "rgb" ? (
-                                <Eye />
-                            ) : (
-                                <EyeClosed className="text-foreground/50" />
-                            )}
-                        </div>
-                    </div>
-                    <div className="bg-white rounded-sm ring ring-foreground/10 p-3 relative">
-                        <button
-                            className="absolute inset-0"
-                            onClick={() => setMode("ms")}
-                        ></button>
-                        <div className="flex justify-between">
-                            <h3>Multispectral Orthomosaic</h3>
-                            {mode == "ms" ? (
-                                <Eye />
-                            ) : (
-                                <EyeClosed className="text-foreground/50" />
-                            )}
-                        </div>
-                    </div>
+                    <AssetCard
+                        isActive={mode == "rgb"}
+                        onClick={() => setMode("rgb")}
+                        title="RGB Orthomosaic"
+                    />
+                    <AssetCard
+                        isActive={mode == "ms"}
+                        onClick={() => setMode("ms")}
+                        title="Multispectral Orthomosaic"
+                    />
                 </div>
             </div>
         </>
