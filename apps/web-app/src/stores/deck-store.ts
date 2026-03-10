@@ -25,6 +25,8 @@ type Size = {
     height: number
 }
 
+type LayersObject = Record<string, Layer>
+
 interface DeckStore {
     deck: Deck | null
     setDeck: (d: Deck | null) => void
@@ -37,15 +39,15 @@ interface DeckStore {
     viewState: MapViewState
     updateViewState: (vs: Partial<MapViewState>) => void
 
-    layers: Layer[]
-    updateLayer: (layer: Layer) => void
-    removeLayer: (id: string) => void
+    layers: LayersObject
+    upsertLayers: (layers: LayersObject) => void
+    removeLayers: (id: string | string[]) => void
     clearLayers: () => void
 }
 
 export const useDeck = create<DeckStore>()(
     persist(
-        (set, get) => ({
+        (set, _get) => ({
             deck: null,
             setDeck: (deck) => set({ deck }),
             isLoaded: false,
@@ -67,33 +69,27 @@ export const useDeck = create<DeckStore>()(
                     },
                 })),
 
-            layers: [],
-            updateLayer: (layer) => {
-                set((state) => {
-                    // Check if layer already exists
-                    const existingIndex = state.layers.findIndex(
-                        (l) => l.id === layer.id,
-                    )
-
-                    if (existingIndex !== -1) {
-                        // Replace existing layer
-                        const newLayers = [...state.layers]
-                        newLayers[existingIndex] = layer
-                        return { layers: newLayers }
-                    } else {
-                        return { layers: [...state.layers, layer] }
-                    }
-                })
-
-                return () => get().removeLayer(layer.id)
-            },
-
-            removeLayer: (id) =>
+            layers: {},
+            upsertLayers: (newLayers) =>
                 set((state) => ({
-                    layers: state.layers.filter((l) => l.id !== id),
+                    layers: {
+                        ...state.layers,
+                        ...newLayers,
+                    },
                 })),
 
-            clearLayers: () => set({ layers: [] }),
+            removeLayers: (id) => {
+                const ids = new Set([id].flat())
+                set((state) => ({
+                    layers: Object.fromEntries(
+                        Object.entries(state.layers).filter(
+                            ([key]) => !ids.has(key),
+                        ),
+                    ),
+                }))
+            },
+
+            clearLayers: () => set({ layers: {} }),
         }),
         {
             name: "deck",
@@ -103,10 +99,15 @@ export const useDeck = create<DeckStore>()(
     ),
 )
 
-export function useDeckLayer(layer: Layer) {
-    const updateLayer = useDeck((s) => s.updateLayer)
-
-    useEffect(() => updateLayer(layer), [layer])
+export function useDeckLayer(layers: LayersObject) {
+    const upsertLayers = useDeck((s) => s.upsertLayers)
+    const removeLayers = useDeck((s) => s.removeLayers)
+    // Update layers when the object change
+    useEffect(() => {
+        upsertLayers(layers)
+    }, [layers])
+    // Only remove layers on unmount
+    useEffect(() => () => removeLayers(Object.keys(layers)), [removeLayers])
 }
 
 export function fitBounds([xmin, ymin, xmax, ymax]: Bounds) {
@@ -135,4 +136,9 @@ export function fitBounds([xmin, ymin, xmax, ymax]: Bounds) {
         },
     )
     updateViewState({ longitude, latitude, zoom })
+}
+
+export function useLayers() {
+    const layerObject = useDeck((s) => s.layers)
+    return Object.values(layerObject)
 }

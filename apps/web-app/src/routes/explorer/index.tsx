@@ -13,6 +13,9 @@ export const Route = createFileRoute("/explorer/")({
     component: RouteComponent,
 })
 
+const ITEMS_SCATTER_ID = "items-scatter"
+const ITEMS_POLYGON_ID = "items-polygon"
+
 function RouteComponent() {
     const {
         data: { features: items },
@@ -28,9 +31,9 @@ function RouteComponent() {
         }
     }, [items, isDeckReady])
 
-    useDeckLayer(
-        new ScatterplotLayer<StacItem>({
-            id: "items-scatter",
+    useDeckLayer({
+        [ITEMS_SCATTER_ID]: new ScatterplotLayer<StacItem>({
+            id: ITEMS_SCATTER_ID,
             data: items,
             getPosition: ({ bbox }) => [
                 (bbox[0] + bbox[2]) / 2,
@@ -54,10 +57,7 @@ function RouteComponent() {
 
             visible: zoom < 12.5,
         }),
-    )
-
-    useDeckLayer(
-        new PolygonLayer<StacItem>({
+        [ITEMS_POLYGON_ID]: new PolygonLayer<StacItem>({
             id: "items-polygons",
             data: items,
             getPolygon: (d) => d.geometry.coordinates,
@@ -80,7 +80,7 @@ function RouteComponent() {
 
             visible: zoom >= 12.5,
         }),
-    )
+    })
 
     return (
         // TODO - Give a max height and make a scroll area

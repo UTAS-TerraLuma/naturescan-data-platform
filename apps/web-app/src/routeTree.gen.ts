@@ -13,7 +13,7 @@ import { Route as LabellerRouteRouteImport } from './routes/labeller/route'
 import { Route as ExplorerRouteRouteImport } from './routes/explorer/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExplorerIndexRouteImport } from './routes/explorer/index'
-import { Route as ExplorerItemIdRouteImport } from './routes/explorer/$itemId'
+import { Route as ExplorerItemIdRouteRouteImport } from './routes/explorer/$itemId/route'
 
 const LabellerRouteRoute = LabellerRouteRouteImport.update({
   id: '/labeller',
@@ -35,7 +35,7 @@ const ExplorerIndexRoute = ExplorerIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ExplorerRouteRoute,
 } as any)
-const ExplorerItemIdRoute = ExplorerItemIdRouteImport.update({
+const ExplorerItemIdRouteRoute = ExplorerItemIdRouteRouteImport.update({
   id: '/$itemId',
   path: '/$itemId',
   getParentRoute: () => ExplorerRouteRoute,
@@ -45,13 +45,13 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/explorer': typeof ExplorerRouteRouteWithChildren
   '/labeller': typeof LabellerRouteRoute
-  '/explorer/$itemId': typeof ExplorerItemIdRoute
+  '/explorer/$itemId': typeof ExplorerItemIdRouteRoute
   '/explorer/': typeof ExplorerIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/labeller': typeof LabellerRouteRoute
-  '/explorer/$itemId': typeof ExplorerItemIdRoute
+  '/explorer/$itemId': typeof ExplorerItemIdRouteRoute
   '/explorer': typeof ExplorerIndexRoute
 }
 export interface FileRoutesById {
@@ -59,7 +59,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/explorer': typeof ExplorerRouteRouteWithChildren
   '/labeller': typeof LabellerRouteRoute
-  '/explorer/$itemId': typeof ExplorerItemIdRoute
+  '/explorer/$itemId': typeof ExplorerItemIdRouteRoute
   '/explorer/': typeof ExplorerIndexRoute
 }
 export interface FileRouteTypes {
@@ -121,19 +121,19 @@ declare module '@tanstack/react-router' {
       id: '/explorer/$itemId'
       path: '/$itemId'
       fullPath: '/explorer/$itemId'
-      preLoaderRoute: typeof ExplorerItemIdRouteImport
+      preLoaderRoute: typeof ExplorerItemIdRouteRouteImport
       parentRoute: typeof ExplorerRouteRoute
     }
   }
 }
 
 interface ExplorerRouteRouteChildren {
-  ExplorerItemIdRoute: typeof ExplorerItemIdRoute
+  ExplorerItemIdRouteRoute: typeof ExplorerItemIdRouteRoute
   ExplorerIndexRoute: typeof ExplorerIndexRoute
 }
 
 const ExplorerRouteRouteChildren: ExplorerRouteRouteChildren = {
-  ExplorerItemIdRoute: ExplorerItemIdRoute,
+  ExplorerItemIdRouteRoute: ExplorerItemIdRouteRoute,
   ExplorerIndexRoute: ExplorerIndexRoute,
 }
 

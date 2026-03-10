@@ -2,7 +2,7 @@ import { DeckGL, type DeckGLRef } from "@deck.gl/react"
 import { Map } from "react-map-gl/maplibre"
 import "maplibre-gl/dist/maplibre-gl.css"
 import { useEffect, useRef } from "react"
-import { useDeck } from "@/stores/deck-store"
+import { useDeck, useLayers } from "@/stores/deck-store"
 
 export function DeckMap() {
     // View State
@@ -13,7 +13,7 @@ export function DeckMap() {
     const setSize = useDeck((s) => s.setSize)
 
     // Layers
-    const layers = useDeck((s) => s.layers)
+    const layers = useLayers()
 
     // Deck Ref
     const deckRef = useRef<DeckGLRef>(null)
