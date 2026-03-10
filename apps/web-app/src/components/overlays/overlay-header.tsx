@@ -1,8 +1,9 @@
 import logoUrl from "@/assets/terra-luma-logo.png"
+import type { ComponentProps } from "react"
 
-export function OverlayHeader() {
+export function OverlayHeader(props: ComponentProps<"div">) {
     return (
-        <div className="px-4">
+        <div {...props}>
             <div className="flex items-center">
                 <img
                     src={logoUrl}

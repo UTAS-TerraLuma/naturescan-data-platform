@@ -1,4 +1,5 @@
-import type { Bounds } from "@/types/spatial"
+export type Point2D = [number, number]
+export type Bounds = [number, number, number, number]
 
 export function getCombinedBounds(bounds: Bounds[]): Bounds {
     let [xMin, yMin, xMax, yMax] = [Infinity, Infinity, -Infinity, -Infinity]
@@ -13,7 +14,7 @@ export function getCombinedBounds(bounds: Bounds[]): Bounds {
     return [xMin, yMin, xMax, yMax]
 }
 
-export function polygonFromBounds(bounds: Bounds): [number, number][] {
+export function polygonFromBounds(bounds: Bounds): Point2D[] {
     const [xMin, yMin, xMax, yMax] = bounds
     return [
         [xMin, yMin],
@@ -22,4 +23,8 @@ export function polygonFromBounds(bounds: Bounds): [number, number][] {
         [xMin, yMax],
         [xMin, yMin],
     ]
+}
+
+export function getCentreFromBbox(bbox: Bounds): Point2D {
+    return [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2]
 }

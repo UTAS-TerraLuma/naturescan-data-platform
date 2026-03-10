@@ -23,7 +23,7 @@ const bandSchema = z.object({
     name: z.string(),
     description: z.string(),
     "eo:common_name": z.string(),
-    statistics: bandStatisticsSchema.optional(),
+    statistics: bandStatisticsSchema,
 })
 
 const thumbnailAssetSchema = z.object({

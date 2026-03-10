@@ -4,9 +4,10 @@ import type {
     MapViewState,
     WebMercatorViewport,
 } from "@deck.gl/core"
-import type { Bounds } from "@/types/spatial"
+import type { Bounds } from "@/lib/spatial-utils"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
+import { useEffect } from "react"
 
 const MAX_ZOOM = 26 // Increased max zoom
 
@@ -35,7 +36,6 @@ interface DeckStore {
 
     viewState: MapViewState
     updateViewState: (vs: Partial<MapViewState>) => void
-    fitBounds: (bounds: Bounds) => void
 
     layers: Layer[]
     updateLayer: (layer: Layer) => void
@@ -66,20 +66,6 @@ export const useDeck = create<DeckStore>()(
                         maxZoom: MAX_ZOOM,
                     },
                 })),
-            fitBounds: ([xmin, ymin, xmax, ymax]: Bounds) => {
-                const { deck, updateViewState, isLoaded } = get()
-
-                if (!deck || !isLoaded) return
-
-                // Sometimes this can still fail if deck
-                // hasn't fully initialised yet
-                const viewport = deck.getViewports()[0] as WebMercatorViewport
-                const { longitude, latitude, zoom } = viewport.fitBounds([
-                    [xmin, ymin],
-                    [xmax, ymax],
-                ])
-                updateViewState({ longitude, latitude, zoom })
-            },
 
             layers: [],
             updateLayer: (layer) => {
@@ -116,3 +102,37 @@ export const useDeck = create<DeckStore>()(
         },
     ),
 )
+
+export function useDeckLayer(layer: Layer) {
+    const updateLayer = useDeck((s) => s.updateLayer)
+
+    useEffect(() => updateLayer(layer), [layer])
+}
+
+export function fitBounds([xmin, ymin, xmax, ymax]: Bounds) {
+    const { deck, updateViewState, isLoaded } = useDeck.getState()
+
+    if (!deck || !isLoaded) return
+
+    // Sometimes this can still fail if deck
+    // hasn't fully initialised yet
+    const viewport = deck.getViewports()[0] as WebMercatorViewport
+
+    const { width } = viewport
+
+    const { longitude, latitude, zoom } = viewport.fitBounds(
+        [
+            [xmin, ymin],
+            [xmax, ymax],
+        ],
+        {
+            padding: {
+                top: 40,
+                bottom: 40,
+                right: 20,
+                left: width / 3 + 20,
+            },
+        },
+    )
+    updateViewState({ longitude, latitude, zoom })
+}

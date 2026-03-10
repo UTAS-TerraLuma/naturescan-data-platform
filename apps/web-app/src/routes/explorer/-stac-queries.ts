@@ -22,5 +22,5 @@ export const nsItemByIdQuery = (id: string) =>
         queryKey: ["naturescan"],
         queryFn: fetchNsItems,
         staleTime: Infinity,
-        select: (data) => data.features.find((item) => item.id == id),
+        select: (data) => data.features.find((item) => item.id == id)!,
     })
