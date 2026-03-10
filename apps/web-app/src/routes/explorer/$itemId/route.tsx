@@ -68,10 +68,10 @@ function RouteComponent() {
                 />
             </div>
             <div className="bg-muted p-2 space-y-2">
-                <div className="flex items-center space-x-2 justify-between">
+                <div className="flex items-center space-x-2">
                     <Label
                         htmlFor="annotations-switch"
-                        className="text-sm pl-2 font-medium text-foreground/75"
+                        className="text-sm pl-2 font-medium text-foreground/75 grow"
                     >
                         Annotations
                     </Label>
