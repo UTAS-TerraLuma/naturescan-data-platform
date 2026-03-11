@@ -3,7 +3,7 @@ import { FullscreenLayout } from "@/components/layouts/fullscreen-layout"
 import { DeckMap } from "@/components/map/deck-map"
 import { nsItemsQuery } from "./-stac-queries"
 import { OverlayHeader } from "@/components/overlays/overlay-header"
-import { BreadCrumbs } from "@/components/overlays/breadcrumbs"
+import { BreadCrumbs } from "./-breadcrumbs"
 import { ViewStateDebug } from "@/components/map/view-state-debug"
 
 export const Route = createFileRoute("/explorer")({

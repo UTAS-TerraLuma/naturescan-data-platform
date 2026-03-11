@@ -24,7 +24,7 @@ export function BreadCrumbs() {
                     >
                         <Map className="size-4" />
                         {/*<span>Item</span>*/}
-                        <span>{itemId}</span>
+                        <span>Item</span>
                     </Link>
                 </>
             )}

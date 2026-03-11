@@ -1,4 +1,9 @@
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router"
+import {
+    createFileRoute,
+    Link,
+    Outlet,
+    useMatchRoute,
+} from "@tanstack/react-router"
 import { nsItemByIdQuery } from "../-stac-queries"
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { fitBounds, useDeck } from "@/stores/deck-store"
@@ -25,17 +30,22 @@ function RouteComponent() {
         }
     }, [item, isDeckReady])
 
+    const matchRoute = useMatchRoute()
+    const isExactMatch = matchRoute({ to: "/explorer/$itemId", fuzzy: false })
+
     return (
         <>
             <ItemSummary item={item} />
             <Assets item={item} />
-            <Link
-                to="/explorer/$itemId/label"
-                params={{ itemId }}
-                className="underline text-primary"
-            >
-                Add Annotations
-            </Link>
+            {isExactMatch && (
+                <Link
+                    to="/explorer/$itemId/label"
+                    params={{ itemId }}
+                    className="underline text-primary"
+                >
+                    Add Labels
+                </Link>
+            )}
             <Outlet />
         </>
     )

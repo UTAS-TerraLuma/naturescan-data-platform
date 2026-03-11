@@ -1,4 +1,5 @@
 export type Point2D = [number, number]
+// minx, miny, maxx, maxy
 export type Bounds = [number, number, number, number]
 
 export function getCombinedBounds(bounds: Bounds[]): Bounds {
