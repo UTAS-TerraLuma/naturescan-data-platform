@@ -7,7 +7,7 @@ import { PolygonLayer, ScatterplotLayer } from "@deck.gl/layers"
 import type { StacItem } from "./-stac-schema"
 import { getCombinedBounds } from "@/lib/spatial-utils"
 import { useEffect } from "react"
-import { ItemCard } from "@/components/overlays/item-card"
+import { ItemCard } from "./-item-card"
 
 export const Route = createFileRoute("/explorer/")({
     component: RouteComponent,

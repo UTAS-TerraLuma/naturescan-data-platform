@@ -13,7 +13,7 @@ import { Route as ExplorerRouteRouteImport } from './routes/explorer/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ExplorerIndexRouteImport } from './routes/explorer/index'
 import { Route as ExplorerItemIdRouteRouteImport } from './routes/explorer/$itemId/route'
-import { Route as ExplorerItemIdLabelRouteImport } from './routes/explorer/$itemId/label'
+import { Route as ExplorerItemIdLabelRouteRouteImport } from './routes/explorer/$itemId/label/route'
 
 const ExplorerRouteRoute = ExplorerRouteRouteImport.update({
   id: '/explorer',
@@ -35,24 +35,25 @@ const ExplorerItemIdRouteRoute = ExplorerItemIdRouteRouteImport.update({
   path: '/$itemId',
   getParentRoute: () => ExplorerRouteRoute,
 } as any)
-const ExplorerItemIdLabelRoute = ExplorerItemIdLabelRouteImport.update({
-  id: '/label',
-  path: '/label',
-  getParentRoute: () => ExplorerItemIdRouteRoute,
-} as any)
+const ExplorerItemIdLabelRouteRoute =
+  ExplorerItemIdLabelRouteRouteImport.update({
+    id: '/label',
+    path: '/label',
+    getParentRoute: () => ExplorerItemIdRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/explorer': typeof ExplorerRouteRouteWithChildren
   '/explorer/$itemId': typeof ExplorerItemIdRouteRouteWithChildren
   '/explorer/': typeof ExplorerIndexRoute
-  '/explorer/$itemId/label': typeof ExplorerItemIdLabelRoute
+  '/explorer/$itemId/label': typeof ExplorerItemIdLabelRouteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/explorer/$itemId': typeof ExplorerItemIdRouteRouteWithChildren
   '/explorer': typeof ExplorerIndexRoute
-  '/explorer/$itemId/label': typeof ExplorerItemIdLabelRoute
+  '/explorer/$itemId/label': typeof ExplorerItemIdLabelRouteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -60,7 +61,7 @@ export interface FileRoutesById {
   '/explorer': typeof ExplorerRouteRouteWithChildren
   '/explorer/$itemId': typeof ExplorerItemIdRouteRouteWithChildren
   '/explorer/': typeof ExplorerIndexRoute
-  '/explorer/$itemId/label': typeof ExplorerItemIdLabelRoute
+  '/explorer/$itemId/label': typeof ExplorerItemIdLabelRouteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -120,18 +121,18 @@ declare module '@tanstack/react-router' {
       id: '/explorer/$itemId/label'
       path: '/label'
       fullPath: '/explorer/$itemId/label'
-      preLoaderRoute: typeof ExplorerItemIdLabelRouteImport
+      preLoaderRoute: typeof ExplorerItemIdLabelRouteRouteImport
       parentRoute: typeof ExplorerItemIdRouteRoute
     }
   }
 }
 
 interface ExplorerItemIdRouteRouteChildren {
-  ExplorerItemIdLabelRoute: typeof ExplorerItemIdLabelRoute
+  ExplorerItemIdLabelRouteRoute: typeof ExplorerItemIdLabelRouteRoute
 }
 
 const ExplorerItemIdRouteRouteChildren: ExplorerItemIdRouteRouteChildren = {
-  ExplorerItemIdLabelRoute: ExplorerItemIdLabelRoute,
+  ExplorerItemIdLabelRouteRoute: ExplorerItemIdLabelRouteRoute,
 }
 
 const ExplorerItemIdRouteRouteWithChildren =

@@ -4,27 +4,23 @@ import { Collapsible } from "@base-ui/react/collapsible"
 export function AssetCard({
     title,
     isActive,
-    onClick,
+    onActiveChange,
     children,
 }: {
     title: string
     isActive: boolean
-    onClick: () => void
+    onActiveChange: (b: boolean) => void
     children?: React.ReactNode
 }) {
     return (
         <Collapsible.Root
             open={isActive}
-            onOpenChange={onClick}
-            className="bg-white rounded-sm ring ring-foreground/10 data-open:bg-primary/10"
+            onOpenChange={onActiveChange}
+            className="bg-white rounded-sm ring ring-foreground/10 data-closed:text-foreground/50"
         >
             <Collapsible.Trigger className="flex w-full items-center justify-between p-3">
-                {title}
-                {isActive ? (
-                    <EyeClosed className="text-foreground/50" />
-                ) : (
-                    <Eye />
-                )}
+                <span>{title}</span>
+                {isActive ? <Eye /> : <EyeClosed className="text-foreground" />}
             </Collapsible.Trigger>
             <Collapsible.Panel>{children}</Collapsible.Panel>
         </Collapsible.Root>
