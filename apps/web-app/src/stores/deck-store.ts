@@ -117,7 +117,8 @@ export function fitBounds([xmin, ymin, xmax, ymax]: Bounds) {
 
     // Sometimes this can still fail if deck
     // hasn't fully initialised yet
-    const viewport = deck.getViewports()[0] as WebMercatorViewport
+    const viewport = deck.getViewports()[0] as WebMercatorViewport | undefined
+    if (!viewport) return
 
     const { width } = viewport
 

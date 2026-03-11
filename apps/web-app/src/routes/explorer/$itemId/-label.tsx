@@ -17,7 +17,10 @@ export function LabelComponent() {
     useEffect(() => {
         if (!deckIsLoaded || !deck) return
 
-        const viewport = deck.getViewports()[0] as WebMercatorViewport
+        const viewport = deck.getViewports()[0] as
+            | WebMercatorViewport
+            | undefined
+        if (!viewport) return
         const { width: canvasWidth, height } = canvasSize
 
         const leftOffset = (1 / 3) * canvasWidth

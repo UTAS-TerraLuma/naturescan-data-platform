@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router"
 import { nsItemByIdQuery } from "../-stac-queries"
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { fitBounds, useDeck } from "@/stores/deck-store"
@@ -8,8 +8,8 @@ import { MsAsset } from "./-ms-asset"
 
 import * as z from "zod"
 import { LabelComponent } from "./-label"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
+import { Field } from "@base-ui/react/field"
+import { Switch } from "@base-ui/react/switch"
 
 export const Route = createFileRoute("/explorer/$itemId")({
     loader: ({ context, params: { itemId } }) =>
@@ -17,6 +17,9 @@ export const Route = createFileRoute("/explorer/$itemId")({
     validateSearch: z.object({
         asset: z.enum(["rgb", "ms"]).default("rgb"),
         label: z.boolean().optional(),
+        msBandRed: z.coerce.number().int().positive().optional(),
+        msBandGreen: z.coerce.number().int().positive().optional(),
+        msBandBlue: z.coerce.number().int().positive().optional(),
     }),
     component: RouteComponent,
 })
@@ -68,14 +71,14 @@ function RouteComponent() {
                 />
             </div>
             <div className="bg-muted p-2 space-y-2">
-                <div className="flex items-center space-x-2">
-                    <Label
+                <Field.Root className="flex items-center space-x-2">
+                    <Field.Label
                         htmlFor="annotations-switch"
                         className="text-sm pl-2 font-medium text-foreground/75 grow"
                     >
                         Annotations
-                    </Label>
-                    <Switch
+                    </Field.Label>
+                    <Switch.Root
                         id="annotations-switch"
                         checked={label}
                         onCheckedChange={(b) =>
@@ -83,11 +86,15 @@ function RouteComponent() {
                                 search: (s) => ({ ...s, label: b }),
                             })
                         }
-                    ></Switch>
-                </div>
+                        className="flex relative items-center p-px w-9 h-6 rounded-[1.5rem] data-checked:bg-foreground/30 data-unchecked:bg-input data-unchecked:justify-start data-checked:justify-end transition-all"
+                    >
+                        <Switch.Thumb className="size-5 bg-background ring ring-foreground/10 rounded-full" />
+                    </Switch.Root>
+                </Field.Root>
             </div>
 
             {label && <LabelComponent />}
+            <Outlet />
         </>
     )
 }

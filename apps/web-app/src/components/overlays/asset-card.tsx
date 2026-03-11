@@ -1,25 +1,32 @@
 import { Eye, EyeClosed } from "lucide-react"
+import { Collapsible } from "@base-ui/react/collapsible"
 
 export function AssetCard({
     title,
     isActive,
     onClick,
+    children,
 }: {
     title: string
     isActive: boolean
     onClick: () => void
+    children?: React.ReactNode
 }) {
     return (
-        <div className="bg-white rounded-sm ring ring-foreground/10 p-3 relative">
-            <button className="absolute inset-0" onClick={onClick}></button>
-            <div className="flex justify-between">
-                <h3>{title}</h3>
+        <Collapsible.Root
+            open={isActive}
+            onOpenChange={onClick}
+            className="bg-white rounded-sm ring ring-foreground/10 data-open:bg-primary/10"
+        >
+            <Collapsible.Trigger className="flex w-full items-center justify-between p-3">
+                {title}
                 {isActive ? (
-                    <Eye />
-                ) : (
                     <EyeClosed className="text-foreground/50" />
+                ) : (
+                    <Eye />
                 )}
-            </div>
-        </div>
+            </Collapsible.Trigger>
+            <Collapsible.Panel>{children}</Collapsible.Panel>
+        </Collapsible.Root>
     )
 }

@@ -1,43 +1,20 @@
 import { useDeck } from "@/stores/deck-store"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
+import { Collapsible } from "@base-ui/react/collapsible"
 import { Locate } from "lucide-react"
-import { Button } from "../ui/button"
-import { useState } from "react"
 
 export function ViewStateDebug() {
     const viewState = useDeck((s) => s.viewState)
-    const [open, setOpen] = useState(false)
 
     return (
-        <Popover
-            open={open}
-            onOpenChange={(open, event) => {
-                // This will keep the popover open when
-                // focusing outside of it
-                if (
-                    event.reason == "focus-out" ||
-                    event.reason == "outside-press"
-                ) {
-                    return
-                }
-                setOpen(open)
-            }}
-        >
-            <PopoverTrigger
-                className="absolute bottom-2 left-2"
-                render={<Button size="icon-lg" variant="secondary" />}
-            >
-                <Locate />
-            </PopoverTrigger>
-            <PopoverContent>
+        <Collapsible.Root className="absolute bottom-2 left-2">
+            <Collapsible.Trigger className="bg-background p-1 rounded-sm ring ring-foreground/10">
+                <Locate className="size-5" />
+            </Collapsible.Trigger>
+            <Collapsible.Panel className="absolute bottom-full left-0 mb-2 bg-background ring ring-foreground/10 rounded-sm p-1 min-w-75">
                 <pre className="text-xs font-mono">
-                    {JSON.stringify(viewState, null, 2)}
+                    {JSON.stringify(viewState, null, 4)}
                 </pre>
-            </PopoverContent>
-        </Popover>
+            </Collapsible.Panel>
+        </Collapsible.Root>
     )
 }
