@@ -12,33 +12,19 @@ const MS_ORTHO_ID = "ms-ortho"
 
 export function AssetLayers() {
     const item = useItem()
+    const matchRoute = useMatchRoute()
 
     const selectedAsset = useAssetStore((s) => s.selectedAsset)
-    const rgbUrl = getTilesUrl(item.assets.rgb.href)
-
-    const matchRoute = useMatchRoute()
     const isLabelRoute = matchRoute({
         to: "/explorer/$itemId/label",
         fuzzy: false,
     })
 
-    const bandIndexes = useAssetStore((s) => s.bandIndexes)
-    const msUrl = useMemo(() => {
-        const { href, bands } = item.assets.ms
+    const rgbParams = useRgbSearchParams()
+    const rgbUrl = getTilesUrl(rgbParams)
 
-        const c1 = bands[bandIndexes.r - 1]
-        const c2 = bands[bandIndexes.g - 1]
-        const c3 = bands[bandIndexes.b - 1]
-
-        return getTilesUrl(href, {
-            bidx: [4, 2, 1],
-            rescale: [
-                `${c1.statistics.mean - 2 * c1.statistics.stddev},${c1.statistics.mean + 2 * c1.statistics.stddev}`,
-                `${c2.statistics.mean - 2 * c2.statistics.stddev},${c2.statistics.mean + 2 * c2.statistics.stddev}`,
-                `${c3.statistics.mean - 2 * c3.statistics.stddev},${c3.statistics.mean + 2 * c3.statistics.stddev}`,
-            ],
-        })
-    }, [item])
+    const mMsParams = useMsSearchParams()
+    const msUrl = getTilesUrl(mMsParams)
 
     useDeckLayer({
         [RGB_ORTHO_ID]: new TileLayer({
@@ -48,7 +34,7 @@ export function AssetLayers() {
             data: rgbUrl,
             minZoom: 18,
 
-            opacity: isLabelRoute ? 0.5 : 1,
+            opacity: isLabelRoute ? 0.2 : 1,
             refinementStrategy: isLabelRoute ? "no-overlap" : "best-available",
 
             renderSubLayers: (props) => {
@@ -77,7 +63,7 @@ export function AssetLayers() {
             data: msUrl,
             minZoom: 18,
 
-            opacity: isLabelRoute ? 0.5 : 1,
+            opacity: isLabelRoute ? 0.2 : 1,
             refinementStrategy: isLabelRoute ? "no-overlap" : "best-available",
 
             renderSubLayers: (props) => {
@@ -102,4 +88,34 @@ export function AssetLayers() {
     })
 
     return null
+}
+
+export function useMsSearchParams() {
+    const item = useItem()
+    const bandIndexes = useAssetStore((s) => s.bandIndexes)
+
+    const { href, bands } = item.assets.ms
+
+    const c1 = bands[bandIndexes.r - 1]
+    const c2 = bands[bandIndexes.g - 1]
+    const c3 = bands[bandIndexes.b - 1]
+
+    return {
+        url: href,
+        bidx: [bandIndexes.r, bandIndexes.g, bandIndexes.b],
+        rescale: [
+            `${c1.statistics.mean - 2 * c1.statistics.stddev},${c1.statistics.mean + 2 * c1.statistics.stddev}`,
+            `${c2.statistics.mean - 2 * c2.statistics.stddev},${c2.statistics.mean + 2 * c2.statistics.stddev}`,
+            `${c3.statistics.mean - 2 * c3.statistics.stddev},${c3.statistics.mean + 2 * c3.statistics.stddev}`,
+        ],
+    }
+}
+
+export function useRgbSearchParams() {
+    const item = useItem()
+    const { href } = item.assets.rgb
+
+    return {
+        url: href,
+    }
 }

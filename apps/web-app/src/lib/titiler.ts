@@ -1,11 +1,8 @@
 const TITILER_URL = import.meta.env.VITE_TILES_API
 const XYZ_TILES_ROUTE = "/cog/tiles/WebMercatorQuad/{z}/{x}/{y}@2x.png"
 
-export function getTilesUrl(cogUrl: string, params: SearchParams = {}) {
-    return createTitilerUrl(XYZ_TILES_ROUTE, {
-        url: cogUrl,
-        ...params,
-    })
+export function getTilesUrl(params: SearchParams = {}) {
+    return createTitilerUrl(XYZ_TILES_ROUTE, params)
 }
 
 type SearchParams = Record<string, string | number | Array<string | number>>

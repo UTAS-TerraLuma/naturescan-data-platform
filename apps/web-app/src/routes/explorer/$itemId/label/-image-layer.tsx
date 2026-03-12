@@ -1,45 +1,43 @@
-import { createTitilerUrl } from "@/lib/titiler"
-import { useItem } from "../-item-provider"
-import { IMAGE_SIZE, useLabelStore } from "./-label-store"
-import type { Bounds } from "@/lib/spatial-utils"
+import { type Bounds } from "@/lib/spatial-utils"
 import { useDeckLayer } from "@/stores/deck-store"
 import { BitmapLayer } from "@deck.gl/layers"
-import { useEffect } from "react"
-
-export function ImageLayer() {
-    const bounds = useLabelStore((s) => s.bounds)
-    const isBoundsPending = useLabelStore((s) => s.boundsPending)
-
-    if (bounds && !isBoundsPending) {
-        return <ImageLayerInner bounds={bounds} />
-    } else {
-        return null
-    }
-}
+import { useQuery } from "@tanstack/react-query"
+// import type { WebMercatorViewport } from "@deck.gl/core"
 
 const LAYER_ID = "label-image-layer"
 
-function ImageLayerInner({ bounds }: { bounds: Bounds }) {
-    const item = useItem()
+interface Props {
+    imageUrl: string
+    bounds: Bounds
+    isStale: boolean
+}
 
-    const imageUrl = createTitilerUrl(
-        `/cog/bbox/${bounds.join(",")}/${IMAGE_SIZE}x${IMAGE_SIZE}.png`,
-        {
-            url: item.assets.rgb.href,
-        },
-    )
+async function fetchImageBitmap(url: string) {
+    const response = await fetch(url)
+    const blob = await response.blob()
+    return await createImageBitmap(blob)
+}
 
-    useDeckLayer({
-        [LAYER_ID]: new BitmapLayer({
-            id: LAYER_ID,
-            image: imageUrl,
-            bounds: bounds,
-        }),
+export function ImageLayer({ bounds, imageUrl, isStale }: Props) {
+    const { data: bitmap, isPending } = useQuery({
+        queryKey: ["image", imageUrl],
+        queryFn: () => fetchImageBitmap(imageUrl),
+        staleTime: Infinity,
+        gcTime: 0, // Don't cache copies
     })
 
-    useEffect(() => {
-        console.log(imageUrl)
-    }, [imageUrl])
+    let bitmapLayer: BitmapLayer | null = new BitmapLayer({
+        id: LAYER_ID,
+        image: bitmap,
+        bounds: bounds,
+    })
+
+    // Set bitmaplayer to null if pending or stale
+    if (isPending || isStale) bitmapLayer = null
+
+    useDeckLayer({
+        [LAYER_ID]: bitmapLayer,
+    })
 
     return null
 }

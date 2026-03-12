@@ -25,7 +25,7 @@ type Size = {
     height: number
 }
 
-type LayersObject = Record<string, Layer>
+type LayersObject = Record<string, Layer | null>
 
 interface DeckStore {
     deck: Deck | null
@@ -107,7 +107,7 @@ export function useDeckLayer(layers: LayersObject) {
         upsertLayers(layers)
     }, [layers])
     // Only remove layers on unmount
-    useEffect(() => () => removeLayers(Object.keys(layers)), [removeLayers])
+    useEffect(() => () => removeLayers(Object.keys(layers)), [])
 }
 
 export function fitBounds([xmin, ymin, xmax, ymax]: Bounds) {
