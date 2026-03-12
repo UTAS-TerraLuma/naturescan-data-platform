@@ -79,7 +79,7 @@ const pcsPromptSchema = z.object({
 export const predictionResultsSchema = z.array(
     z.object({
         id: z.string(),
-        image_url: z.url(),
+        image: z.url(),
         prompt: z.union([pvsPromptSechma, pcsPromptSchema]).nullable(),
         result: resultSchema,
     }),

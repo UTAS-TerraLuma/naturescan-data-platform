@@ -9,7 +9,7 @@ const API_URL = import.meta.env.VITE_SEGMENTATION_API
 
 export async function setImage(imageUrl: string): Promise<void> {
     const res = await fetch(
-        `${API_URL}/set-image?image_path=${encodeURIComponent(imageUrl)}`,
+        `${API_URL}/set-image?image=${encodeURIComponent(imageUrl)}`,
         {
             method: "POST",
         },
@@ -19,8 +19,9 @@ export async function setImage(imageUrl: string): Promise<void> {
 
 export async function predict(
     prompt: VisualPrompt | ConceptPrompt | null,
+    image: string,
 ): Promise<PredictionResult[]> {
-    const body = { prompt }
+    const body = { prompt, image }
 
     const res = await fetch(`${API_URL}/predict`, {
         method: "POST",

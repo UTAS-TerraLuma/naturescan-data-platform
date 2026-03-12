@@ -10,9 +10,11 @@ import {
     labellerSearchSchema,
     type BBoxPrompt,
     type BoxCorners,
+    type ConceptPrompt,
     type PointPrompt,
     type PredictionResult,
     type PromptMode,
+    type VisualPrompt,
 } from "./-types"
 import { ImageStatusIndicator } from "./-components/ImageStatusIndicator"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -103,7 +105,8 @@ function RouteComponent() {
 
     // ---- Predict Mutations ----
     const predictMutation = useMutation({
-        mutationFn: predict,
+        mutationFn: (p: VisualPrompt | ConceptPrompt | null) =>
+            predict(p, imageUrl),
         onSuccess: addResults,
         onError: (err) => console.error("PVS error:", err),
         onSettled: clearPromptState,
