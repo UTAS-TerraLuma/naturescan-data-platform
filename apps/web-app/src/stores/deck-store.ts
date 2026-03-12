@@ -9,7 +9,7 @@ import { create } from "zustand"
 import { persist } from "zustand/middleware"
 import { useEffect } from "react"
 
-const MAX_ZOOM = 26 // Increased max zoom
+export const MAX_ZOOM = 26 // Increased max zoom
 
 const INITIAL_VIEW_STATE: MapViewState = {
     longitude: 146.72470583325884,

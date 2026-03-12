@@ -1,15 +1,18 @@
-import type { StacItem } from "../-stac-schema"
-
 import { AssetCard } from "./-asset-card"
 import { useAssetStore } from "./-asset-store"
 
-export function RgbAssetCard({ item: _item }: { item: StacItem }) {
-    const showRgb = useAssetStore((s) => s.showRgb)
-    const setShowRgb = useAssetStore((s) => s.setShowRgb)
+export function RgbAssetCard() {
+    const selectedAsset = useAssetStore((s) => s.selectedAsset)
+    const setSelectedAsset = useAssetStore((s) => s.setSelectedAsset)
+
+    const isActive = selectedAsset == "rgb"
+    const onActiveChange = (show: boolean) =>
+        setSelectedAsset(show ? "rgb" : "ms")
+
     return (
         <AssetCard
-            isActive={showRgb}
-            onActiveChange={setShowRgb}
+            isActive={isActive}
+            onActiveChange={onActiveChange}
             title="RGB Orthomosaic"
         />
     )

@@ -1,11 +1,9 @@
 import { OverlaySection } from "@/components/overlays/overlay-section"
-import type { StacItem } from "../-stac-schema"
+import { useItem } from "./-item-provider"
 
-interface Props {
-    item: StacItem
-}
+export function ItemSummary() {
+    const item = useItem()
 
-export function ItemSummary({ item }: Props) {
     return (
         <OverlaySection title="Summary" defaultOpen muted={false}>
             <div className="p-3">

@@ -10,6 +10,7 @@ import { fitBounds, useDeck } from "@/stores/deck-store"
 import { useEffect } from "react"
 import { Assets } from "./-assets"
 import { ItemSummary } from "./-item-summary"
+import { ItemProvider } from "./-item-provider"
 
 export const Route = createFileRoute("/explorer/$itemId")({
     loader: ({ context, params: { itemId } }) =>
@@ -34,9 +35,9 @@ function RouteComponent() {
     const isExactMatch = matchRoute({ to: "/explorer/$itemId", fuzzy: false })
 
     return (
-        <>
-            <ItemSummary item={item} />
-            <Assets item={item} />
+        <ItemProvider item={item}>
+            <ItemSummary />
+            <Assets />
             {isExactMatch && (
                 <Link
                     to="/explorer/$itemId/label"
@@ -47,6 +48,6 @@ function RouteComponent() {
                 </Link>
             )}
             <Outlet />
-        </>
+        </ItemProvider>
     )
 }

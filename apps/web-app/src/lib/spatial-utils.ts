@@ -1,6 +1,7 @@
 export type Point2D = [number, number]
 // minx, miny, maxx, maxy
 export type Bounds = [number, number, number, number]
+export type BoxCorners = [[number, number], [number, number]]
 
 export function getCombinedBounds(bounds: Bounds[]): Bounds {
     let [xMin, yMin, xMax, yMax] = [Infinity, Infinity, -Infinity, -Infinity]
@@ -28,4 +29,11 @@ export function polygonFromBounds(bounds: Bounds): Point2D[] {
 
 export function getCentreFromBbox(bbox: Bounds): Point2D {
     return [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2]
+}
+
+export function boundsToCorners(bounds: Bounds): BoxCorners {
+    return [
+        [bounds[0], bounds[1]],
+        [bounds[2], bounds[3]],
+    ]
 }

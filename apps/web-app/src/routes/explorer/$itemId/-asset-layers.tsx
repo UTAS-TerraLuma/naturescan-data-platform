@@ -1,23 +1,27 @@
 import { getTilesUrl } from "@/lib/titiler"
-import type { StacItem } from "../-stac-schema"
 import { useDeckLayer } from "@/stores/deck-store"
 import { TileLayer } from "@deck.gl/geo-layers"
 import { BitmapLayer } from "@deck.gl/layers"
 import { useAssetStore } from "./-asset-store"
 import { useMemo } from "react"
+import { useMatchRoute } from "@tanstack/react-router"
+import { useItem } from "./-item-provider"
 
 const RGB_ORTHO_ID = "rgb-ortho"
 const MS_ORTHO_ID = "ms-ortho"
 
-interface Props {
-    item: StacItem
-}
+export function AssetLayers() {
+    const item = useItem()
 
-export function AssetLayers({ item }: Props) {
-    const showRgb = useAssetStore((s) => s.showRgb)
+    const selectedAsset = useAssetStore((s) => s.selectedAsset)
     const rgbUrl = getTilesUrl(item.assets.rgb.href)
 
-    const showMs = useAssetStore((s) => s.showMs)
+    const matchRoute = useMatchRoute()
+    const isLabelRoute = matchRoute({
+        to: "/explorer/$itemId/label",
+        fuzzy: false,
+    })
+
     const bandIndexes = useAssetStore((s) => s.bandIndexes)
     const msUrl = useMemo(() => {
         const { href, bands } = item.assets.ms
@@ -39,10 +43,14 @@ export function AssetLayers({ item }: Props) {
     useDeckLayer({
         [RGB_ORTHO_ID]: new TileLayer({
             id: RGB_ORTHO_ID,
-            visible: showRgb,
+            visible: selectedAsset == "rgb",
             extent: item.bbox,
             data: rgbUrl,
             minZoom: 18,
+
+            opacity: isLabelRoute ? 0.5 : 1,
+            refinementStrategy: isLabelRoute ? "no-overlap" : "best-available",
+
             renderSubLayers: (props) => {
                 const { boundingBox } = props.tile
 
@@ -64,10 +72,14 @@ export function AssetLayers({ item }: Props) {
         }),
         [MS_ORTHO_ID]: new TileLayer({
             id: MS_ORTHO_ID,
-            visible: showMs,
+            visible: selectedAsset == "ms",
             extent: item.bbox,
             data: msUrl,
             minZoom: 18,
+
+            opacity: isLabelRoute ? 0.5 : 1,
+            refinementStrategy: isLabelRoute ? "no-overlap" : "best-available",
+
             renderSubLayers: (props) => {
                 const { boundingBox } = props.tile
 

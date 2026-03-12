@@ -3,14 +3,35 @@ import { useDeck, useDeckLayer } from "@/stores/deck-store"
 import { WebMercatorViewport } from "@deck.gl/core"
 import { PolygonLayer } from "@deck.gl/layers"
 import { useEffect, useState } from "react"
+import { useDebouncer } from "@tanstack/react-pacer"
+import { useLabelStore } from "./-label-store"
 
 const BOX_ID = "wgs84-screen-box"
 
 export function ImageBoundsLayer() {
     const viewState = useDeck((s) => s.viewState)
     const size = useDeck((s) => s.size)
+    const [previewBounds, setPreviewBounds] = useState<Bounds | null>(null)
+    const setBounds = useLabelStore((s) => s.setBounds)
+    const setBoundsIsPending = useLabelStore((s) => s.setBoundsPending)
 
-    const [bounds, setBounds] = useState<Bounds>([0, 0, 0, 0])
+    const boundsDebouncer = useDebouncer(
+        (bounds: Bounds) => setBounds(bounds),
+        { wait: 300 },
+        (state) => ({ isPending: state.isPending }),
+    )
+
+    const isPending = boundsDebouncer.state.isPending
+
+    useEffect(() => {
+        if (previewBounds) {
+            boundsDebouncer.maybeExecute(previewBounds)
+        }
+    }, [previewBounds])
+
+    useEffect(() => {
+        setBoundsIsPending(isPending)
+    }, [isPending])
 
     useEffect(() => {
         // Get current viewport
@@ -41,19 +62,19 @@ export function ImageBoundsLayer() {
             yOffset,
         ])
 
-        setBounds([lngMin, latMin, lngMax, latMax])
+        setPreviewBounds([lngMin, latMin, lngMax, latMax])
     }, [viewState, size])
 
     useDeckLayer({
         [BOX_ID]: new PolygonLayer<Bounds>({
             id: BOX_ID,
-            data: [bounds],
+            data: [previewBounds],
             getPolygon: (d) => polygonFromBounds(d),
 
             filled: false,
             stroked: true,
 
-            getLineColor: [0, 0, 0],
+            getLineColor: isPending ? [250, 250, 0] : [0, 0, 0],
             getLineWidth: 2,
             lineWidthUnits: "pixels",
         }),

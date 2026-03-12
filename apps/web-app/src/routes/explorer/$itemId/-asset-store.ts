@@ -6,23 +6,19 @@ interface BandIndexes {
     b: number
 }
 
-interface AssetStore {
-    showRgb: boolean
-    setShowRgb: (show: boolean) => void
+type AssetType = "rgb" | "ms"
 
-    showMs: boolean
-    setShowMs: (show: boolean) => void
+interface AssetStore {
+    selectedAsset: AssetType
+    setSelectedAsset: (m: AssetType) => void
 
     bandIndexes: BandIndexes
     setBandIndexes: (bands: Partial<BandIndexes>) => void
 }
 
 export const useAssetStore = create<AssetStore>((set) => ({
-    showRgb: true,
-    setShowRgb: (show) => set({ showRgb: show, showMs: !show }),
-
-    showMs: false,
-    setShowMs: (show) => set({ showMs: show, showRgb: !show }),
+    selectedAsset: "rgb",
+    setSelectedAsset: (mode) => set({ selectedAsset: mode }),
 
     bandIndexes: { r: 4, g: 2, b: 1 },
     setBandIndexes: (bands) =>
