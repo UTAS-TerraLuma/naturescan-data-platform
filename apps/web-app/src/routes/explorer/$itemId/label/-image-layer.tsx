@@ -9,7 +9,7 @@ const LAYER_ID = "label-image-layer"
 interface Props {
     imageUrl: string
     bounds: Bounds
-    isStale: boolean
+    boundsAreStale: boolean
 }
 
 async function fetchImageBitmap(url: string) {
@@ -18,7 +18,7 @@ async function fetchImageBitmap(url: string) {
     return await createImageBitmap(blob)
 }
 
-export function ImageLayer({ bounds, imageUrl, isStale }: Props) {
+export function ImageLayer({ bounds, imageUrl, boundsAreStale }: Props) {
     const { data: bitmap, isPending } = useQuery({
         queryKey: ["image", imageUrl],
         queryFn: () => fetchImageBitmap(imageUrl),
@@ -33,7 +33,7 @@ export function ImageLayer({ bounds, imageUrl, isStale }: Props) {
     })
 
     // Set bitmaplayer to null if pending or stale
-    if (isPending || isStale) bitmapLayer = null
+    if (isPending || boundsAreStale) bitmapLayer = null
 
     useDeckLayer({
         [LAYER_ID]: bitmapLayer,

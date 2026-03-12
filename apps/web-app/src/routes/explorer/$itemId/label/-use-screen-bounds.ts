@@ -46,19 +46,3 @@ export function useScreenSquareBounds() {
 
     return bounds
 }
-
-/**
- * Debounced screen square bounds are calculated after a user
- * has stopped moving around the map
- */
-export function useDebouncedScreenSquareBounds(): [Bounds, boolean] {
-    const previewBounds = useScreenSquareBounds()
-    const [bounds, boundsDebouncer] = useDebouncedValue(
-        previewBounds,
-        { wait: 300 },
-        (state) => ({ isStale: state.isPending }),
-    )
-    const isStale = boundsDebouncer.state.isStale
-
-    return [bounds, isStale]
-}

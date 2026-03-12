@@ -1,14 +1,13 @@
 import { polygonFromBounds, type Bounds } from "@/lib/spatial-utils"
 import { useDeckLayer } from "@/stores/deck-store"
 import { PolygonLayer } from "@deck.gl/layers"
-
-interface Props {
-    bounds: Bounds
-}
+import { useScreenSquareBounds } from "./-use-screen-bounds"
 
 const LAYER_ID = "preview-bounds-layer"
 
-export function PreviewBoundsLayer({ bounds }: Props) {
+export function PreviewBoundsLayer() {
+    const bounds = useScreenSquareBounds()
+
     useDeckLayer({
         [LAYER_ID]: new PolygonLayer<Bounds>({
             id: LAYER_ID,
