@@ -18,11 +18,15 @@ export function AssetCard({
             onOpenChange={onActiveChange}
             className="bg-white rounded-sm ring ring-foreground/10 data-closed:text-foreground/50"
         >
-            <Collapsible.Trigger className="flex w-full items-center justify-between p-3">
+            <Collapsible.Trigger className="flex w-full items-center justify-between p-2">
                 <span>{title}</span>
                 {isActive ? <Eye /> : <EyeClosed className="text-foreground" />}
             </Collapsible.Trigger>
-            <Collapsible.Panel>{children}</Collapsible.Panel>
+            {children && (
+                <Collapsible.Panel className="data-open:p-2 data-open:space-y-2 bg-muted">
+                    {children}
+                </Collapsible.Panel>
+            )}
         </Collapsible.Root>
     )
 }

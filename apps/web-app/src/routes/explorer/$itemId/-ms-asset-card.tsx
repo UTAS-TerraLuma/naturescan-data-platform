@@ -20,6 +20,9 @@ export function MsAssetCard() {
             isActive={isActive}
             onActiveChange={onActiveChange}
             title="Multispectral Orthomosaic"
-        />
+        >
+            <p>Hello Assets</p>
+            <p>Hello Sass</p>
+        </AssetCard>
     )
 }

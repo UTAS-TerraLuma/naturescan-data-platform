@@ -1,6 +1,5 @@
 import { OverlaySection } from "@/components/overlays/overlay-section"
 import { createFileRoute } from "@tanstack/react-router"
-import { ImageLayer } from "./-image-layer"
 
 import { PreviewBoundsLayer } from "./-preview-bounds-layer"
 import { Prompts } from "./-prompts"
@@ -19,12 +18,6 @@ function RouteComponent() {
             </OverlaySection>
 
             {/* Layers */}
-            {/*<ImageLayer
-                imageUrl={imageUrl}
-                bounds={bounds}
-                boundsAreStale={boundsAreStale}
-            />
-            */}
             <PreviewBoundsLayer />
         </LabelImageProvider>
     )
