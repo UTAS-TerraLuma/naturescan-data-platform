@@ -92,7 +92,8 @@ export function AssetLayers() {
 
 export function useMsSearchParams() {
     const item = useItem()
-    const bandIndexes = useAssetStore((s) => s.bandIndexes)
+    const preset = useAssetStore((s) => s.msPreset)
+    const bandIndexes = preset.value
 
     const { href, bands } = item.assets.ms
 

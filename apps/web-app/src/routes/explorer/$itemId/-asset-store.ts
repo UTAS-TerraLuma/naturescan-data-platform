@@ -14,16 +14,20 @@ interface AssetStore {
 
     bandIndexes: BandIndexes
     setBandIndexes: (bands: Partial<BandIndexes>) => void
+
+    msPreset: Preset
+    setMsPreset: (p: Preset) => void
 }
 
-const presets = ["4,2,1", "3,4,1"] as const
-
-const presetCombinations: Record<Preset, BandIndexes> = {
-    "3,4,1": { r: 3, g: 4, b: 1 },
-    "4,2,1": { r: 4, g: 2, b: 1 },
+export type Preset = {
+    label: string
+    value: BandIndexes
 }
 
-type Preset = (typeof presets)[number]
+export const presets: Preset[] = [
+    { label: "NIR Red Green (4,2,1)", value: { r: 4, g: 2, b: 1 } },
+    { label: "RedEdge NIR Green (3,4,1)", value: { r: 3, g: 4, b: 1 } },
+]
 
 export const useAssetStore = create<AssetStore>((set) => ({
     selectedAsset: "rgb",
@@ -34,4 +38,7 @@ export const useAssetStore = create<AssetStore>((set) => ({
         set((state) => ({
             bandIndexes: { ...state.bandIndexes, ...bands },
         })),
+
+    msPreset: presets[0],
+    setMsPreset: (msPreset) => set({ msPreset }),
 }))
