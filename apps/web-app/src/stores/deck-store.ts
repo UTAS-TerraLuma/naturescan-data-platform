@@ -11,6 +11,33 @@ import { useEffect } from "react"
 
 export const MAX_ZOOM = 26 // Increased max zoom
 
+const MAPTILER_KEY = "lYXcwbBzdM1BYO9QcWIz"
+
+export type Basemap = { id: string; label: string; url: string }
+
+export const BASEMAPS: Basemap[] = [
+    {
+        id: "satellite",
+        label: "Satellite",
+        url: `https://api.maptiler.com/maps/satellite/style.json?key=${MAPTILER_KEY}`,
+    },
+    {
+        id: "base",
+        label: "Base",
+        url: `https://api.maptiler.com/maps/basic-v2/style.json?key=${MAPTILER_KEY}`,
+    },
+    {
+        id: "dataviz",
+        label: "Dataviz",
+        url: `https://api.maptiler.com/maps/dataviz/style.json?key=${MAPTILER_KEY}`,
+    },
+    {
+        id: "streets",
+        label: "Streets",
+        url: `https://api.maptiler.com/maps/streets-v2/style.json?key=${MAPTILER_KEY}`,
+    },
+]
+
 const INITIAL_VIEW_STATE: MapViewState = {
     longitude: 146.72470583325884,
     latitude: -42.182031003074464,
@@ -38,6 +65,9 @@ interface DeckStore {
 
     viewState: MapViewState
     updateViewState: (vs: Partial<MapViewState>) => void
+
+    basemap: Basemap
+    setBasemap: (b: Basemap) => void
 
     layers: LayersObject
     upsertLayers: (layers: LayersObject) => void
@@ -69,6 +99,9 @@ export const useDeck = create<DeckStore>()(
                     },
                 })),
 
+            basemap: BASEMAPS[0],
+            setBasemap: (basemap) => set({ basemap }),
+
             layers: {},
             upsertLayers: (newLayers) =>
                 set((state) => ({
@@ -93,8 +126,11 @@ export const useDeck = create<DeckStore>()(
         }),
         {
             name: "deck",
-            // Only need to persist viewState
-            partialize: (state) => ({ viewState: state.viewState }),
+            // Only need to persist viewState and basemap
+            partialize: (state) => ({
+                viewState: state.viewState,
+                basemap: state.basemap,
+            }),
         },
     ),
 )

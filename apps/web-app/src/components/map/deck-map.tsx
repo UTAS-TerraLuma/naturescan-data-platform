@@ -8,6 +8,7 @@ export function DeckMap() {
     // View State
     const viewState = useDeck((s) => s.viewState)
     const updateViewState = useDeck((s) => s.updateViewState)
+    const basemap = useDeck((s) => s.basemap)
 
     // Canvas size
     const setSize = useDeck((s) => s.setSize)
@@ -42,7 +43,7 @@ export function DeckMap() {
                 onResize={(size) => setSize(size)}
                 onLoad={() => setIsLoaded(true)}
             >
-                <Map mapStyle="https://api.maptiler.com/maps/hybrid-v4/style.json?key=lYXcwbBzdM1BYO9QcWIz" />
+                <Map mapStyle={basemap.url} />
             </DeckGL>
         </div>
     )

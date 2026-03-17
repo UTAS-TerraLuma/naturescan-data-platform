@@ -6,8 +6,8 @@ export function ViewStateDebug() {
     const viewState = useDeck((s) => s.viewState)
 
     return (
-        <Collapsible.Root className="absolute bottom-2 left-2">
-            <Collapsible.Trigger className="bg-background p-1 rounded-sm ring ring-foreground/10">
+        <Collapsible.Root className="relative">
+            <Collapsible.Trigger className="bg-background p-1.5 rounded-sm ring ring-foreground/10">
                 <Locate className="size-5" />
             </Collapsible.Trigger>
             <Collapsible.Panel className="absolute bottom-full left-0 mb-2 bg-background ring ring-foreground/10 rounded-sm p-1 min-w-75">

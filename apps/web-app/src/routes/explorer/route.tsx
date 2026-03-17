@@ -5,6 +5,7 @@ import { nsItemsQuery } from "./-stac-queries"
 import { OverlayHeader } from "@/components/overlays/overlay-header"
 import { BreadCrumbs } from "./-breadcrumbs"
 import { ViewStateDebug } from "@/components/map/view-state-debug"
+import { BasemapSelect } from "@/components/map/basemap-select"
 
 export const Route = createFileRoute("/explorer")({
     loader: ({ context }) => {
@@ -24,8 +25,9 @@ function RouteComponent() {
                     <Outlet />
                 </div>
             </div>
-            <div className="absolute bottom-0 left-0">
+            <div className="absolute bottom-2 left-2 flex gap-2 items-end">
                 <ViewStateDebug />
+                <BasemapSelect />
             </div>
         </FullscreenLayout>
     )
