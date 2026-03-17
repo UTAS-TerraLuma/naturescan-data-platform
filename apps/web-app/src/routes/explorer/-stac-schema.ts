@@ -49,10 +49,26 @@ const dataAssetSchema = z.object({
     roles: z.array(z.literal("data")),
 })
 
+const pointCloudAssetSchema = z.object({
+    href: z.url(),
+    type: z.literal("application/vnd.laszip+copc"),
+    title: z.string(),
+    roles: z.array(z.literal("data")),
+})
+
+const reportAssetSchema = z.object({
+    href: z.url(),
+    type: z.literal("application/pdf"),
+    title: z.string(),
+    roles: z.array(z.literal("metadata")),
+})
+
 const assetsObjectSchema = z.object({
     thumbnail: thumbnailAssetSchema,
     rgb: dataAssetSchema,
     ms: dataAssetSchema,
+    pointcloud: pointCloudAssetSchema.optional(),
+    "metashape-report": reportAssetSchema.optional(),
 })
 
 const propertiesSchema = z.object({
