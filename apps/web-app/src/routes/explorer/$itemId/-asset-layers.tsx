@@ -3,7 +3,6 @@ import { useDeckLayer } from "@/stores/deck-store"
 import { TileLayer } from "@deck.gl/geo-layers"
 import { BitmapLayer } from "@deck.gl/layers"
 import { useAssetStore } from "./-asset-store"
-import { useMemo } from "react"
 import { useMatchRoute } from "@tanstack/react-router"
 import { useItem } from "./-item-provider"
 

@@ -42,7 +42,7 @@ export function DeckMap() {
                 onResize={(size) => setSize(size)}
                 onLoad={() => setIsLoaded(true)}
             >
-                <Map mapStyle="https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json" />
+                <Map mapStyle="https://api.maptiler.com/maps/hybrid-v4/style.json?key=lYXcwbBzdM1BYO9QcWIz" />
             </DeckGL>
         </div>
     )
