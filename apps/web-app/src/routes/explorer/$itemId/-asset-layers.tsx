@@ -92,17 +92,21 @@ export function AssetLayers() {
 export function useMsSearchParams() {
     const item = useItem()
     const preset = useAssetStore((s) => s.msPreset)
-    const bandIndexes = preset.value
-
     const { href, bands } = item.assets.ms
 
-    const c1 = bands[bandIndexes.r - 1]
-    const c2 = bands[bandIndexes.g - 1]
-    const c3 = bands[bandIndexes.b - 1]
+    if (preset.value.type === "expression") {
+        const { expression, colormap_name, rescale } = preset.value
+        return { url: href, expression, colormap_name, rescale }
+    }
+
+    const { r, g, b } = preset.value
+    const c1 = bands[r - 1]
+    const c2 = bands[g - 1]
+    const c3 = bands[b - 1]
 
     return {
         url: href,
-        bidx: [bandIndexes.r, bandIndexes.g, bandIndexes.b],
+        bidx: [r, g, b],
         rescale: [
             `${c1.statistics.mean - 2 * c1.statistics.stddev},${c1.statistics.mean + 2 * c1.statistics.stddev}`,
             `${c2.statistics.mean - 2 * c2.statistics.stddev},${c2.statistics.mean + 2 * c2.statistics.stddev}`,
