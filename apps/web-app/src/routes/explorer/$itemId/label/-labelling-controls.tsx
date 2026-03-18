@@ -45,6 +45,7 @@ export function LabellingControls() {
         togglePvsSimpleMode()
     }, [locked, promptMode, togglePvsSimpleMode])
 
+    useKeyPress("l", toggleLocked)
     useKeyPress("Enter", handleSubmit)
     useKeyPress("Escape", handleClear)
     useKeyPress("m", handleToggleMode)
@@ -135,7 +136,10 @@ export function LabellingControls() {
                             </Field.Label>
                             <Input
                                 value={nounPhrase}
-                                onChange={(e) => setNounPhrase(e.target.value)}
+                                onChange={(e) => {
+                                    e.stopPropagation()
+                                    setNounPhrase(e.target.value)
+                                }}
                                 className="px-2 py-1 text-xs rounded-sm bg-foreground/5 border border-foreground/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-foreground/20"
                                 placeholder="e.g. red car"
                             />

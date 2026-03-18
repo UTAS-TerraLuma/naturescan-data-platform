@@ -5,7 +5,7 @@ import { useLabelStore } from "./-label-store"
 
 const LAYER_ID = "preview-bounds-layer"
 
-export function useBoundsOutlineLayer() {
+export function BoundsOutlineLayer() {
     const bounds = useLabelStore((s) => s.bounds)
 
     useDeckLayer({
@@ -21,4 +21,6 @@ export function useBoundsOutlineLayer() {
             lineWidthUnits: "pixels",
         }),
     })
+
+    return null
 }

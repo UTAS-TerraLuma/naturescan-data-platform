@@ -1,6 +1,6 @@
 import type { Bounds } from "@/lib/spatial-utils"
 import { create } from "zustand"
-import type { PromptMode } from "./-prompt-types"
+import type { BBoxPrompt, PointPrompt, PromptMode } from "./-prompt-types"
 
 interface LabelStore {
     locked: boolean
@@ -17,6 +17,17 @@ interface LabelStore {
 
     nounPhrase: string
     setNounPhrase: (phrase: string) => void
+
+    points: PointPrompt[]
+    addPoint: (p: PointPrompt) => void
+
+    bbox: BBoxPrompt | null
+    setBBox: (b: BBoxPrompt) => void
+
+    exemplars: BBoxPrompt[]
+    addExemplar: (e: BBoxPrompt) => void
+
+    clearPrompts: () => void
 }
 
 export const useLabelStore = create<LabelStore>((set) => ({
@@ -32,9 +43,21 @@ export const useLabelStore = create<LabelStore>((set) => ({
     promptMode: "pvs",
     setPromptMode: (mode) => set({ promptMode: mode }),
 
-    pvsSimpleMode: true,
-    togglePvsSimpleMode: () => set((s) => ({ pvsSimpleMode: !s.pvsSimpleMode })),
+    pvsSimpleMode: false,
+    togglePvsSimpleMode: () =>
+        set((s) => ({ pvsSimpleMode: !s.pvsSimpleMode })),
 
     nounPhrase: "",
     setNounPhrase: (phrase) => set({ nounPhrase: phrase }),
+
+    points: [],
+    addPoint: (p) => set((s) => ({ points: [...s.points, p] })),
+
+    bbox: null,
+    setBBox: (b) => set({ bbox: b }),
+
+    exemplars: [],
+    addExemplar: (e) => set((s) => ({ exemplars: [...s.exemplars, e] })),
+
+    clearPrompts: () => set({ points: [], bbox: null, exemplars: [] }),
 }))

@@ -23,7 +23,7 @@ export function useImageUrl() {
     return imageUrl
 }
 
-export function useImageLayer() {
+export function ImageLayer() {
     const locked = useLabelStore((s) => s.locked)
     const bounds = useLabelStore((s) => s.bounds)
     const imageUrl = useImageUrl()
@@ -46,4 +46,6 @@ export function useImageLayer() {
     useDeckLayer({
         [LAYER_ID]: bitmapLayer,
     })
+
+    return null
 }
