@@ -5,6 +5,7 @@ import { BitmapLayer } from "@deck.gl/layers"
 import { useAssetStore } from "./-asset-store"
 import { useMatchRoute } from "@tanstack/react-router"
 import { useItem } from "./-item-provider"
+import { useLabelStore } from "./label/-label-store"
 
 const RGB_ORTHO_ID = "rgb-ortho"
 const MS_ORTHO_ID = "ms-ortho"
@@ -18,6 +19,11 @@ export function AssetLayers() {
         to: "/explorer/$itemId/label",
         fuzzy: false,
     })
+    const isLocked = useLabelStore((s) => s.locked)
+
+    const opacity = isLabelRoute && isLocked ? 0.2 : 1
+    const refinementStrategy =
+        isLabelRoute && isLocked ? "no-overlap" : "best-available"
 
     const rgbParams = useRgbSearchParams()
     const rgbUrl = getTilesUrl(rgbParams)
@@ -33,8 +39,8 @@ export function AssetLayers() {
             data: rgbUrl,
             minZoom: 18,
 
-            opacity: isLabelRoute ? 0.2 : 1,
-            refinementStrategy: isLabelRoute ? "no-overlap" : "best-available",
+            opacity,
+            refinementStrategy,
 
             renderSubLayers: (props) => {
                 const { boundingBox } = props.tile
@@ -62,8 +68,8 @@ export function AssetLayers() {
             data: msUrl,
             minZoom: 18,
 
-            opacity: isLabelRoute ? 0.2 : 1,
-            refinementStrategy: isLabelRoute ? "no-overlap" : "best-available",
+            opacity,
+            refinementStrategy,
 
             renderSubLayers: (props) => {
                 const { boundingBox } = props.tile

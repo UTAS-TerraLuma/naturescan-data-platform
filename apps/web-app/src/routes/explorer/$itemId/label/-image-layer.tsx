@@ -8,7 +8,7 @@ import { createTitilerUrl } from "@/lib/titiler"
 const LAYER_ID = "label-image-layer"
 const IMAGE_SIZE = 1036
 
-function useImageUrl() {
+export function useImageUrl() {
     const selectedAsset = useAssetStore((s) => s.selectedAsset)
     const msParams = useMsSearchParams()
     const rgbParams = useRgbSearchParams()

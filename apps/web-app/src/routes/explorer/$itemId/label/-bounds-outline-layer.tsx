@@ -16,8 +16,8 @@ export function useBoundsOutlineLayer() {
             stroked: true,
             filled: false,
 
-            getLineColor: [0, 0, 0, 100],
-            getLineWidth: 1,
+            getLineColor: [255, 255, 255],
+            getLineWidth: 2,
             lineWidthUnits: "pixels",
         }),
     })

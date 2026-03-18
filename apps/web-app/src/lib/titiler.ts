@@ -5,7 +5,10 @@ export function getTilesUrl(params: SearchParams = {}) {
     return createTitilerUrl(XYZ_TILES_ROUTE, params)
 }
 
-type SearchParams = Record<string, string | number | Array<string | number>>
+type SearchParams = Record<
+    string,
+    string | number | Array<string | number> | undefined
+>
 
 export function createTitilerUrl(
     apiRoute: string,
