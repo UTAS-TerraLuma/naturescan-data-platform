@@ -1,7 +1,6 @@
 import type { Bounds } from "@/lib/spatial-utils"
 import { useDeck } from "@/stores/deck-store"
 import { WebMercatorViewport } from "@deck.gl/core"
-import { useDebouncedValue } from "@tanstack/react-pacer"
 import { useMemo } from "react"
 
 /**

@@ -1,12 +1,12 @@
 import { polygonFromBounds, type Bounds } from "@/lib/spatial-utils"
 import { useDeckLayer } from "@/stores/deck-store"
 import { PolygonLayer } from "@deck.gl/layers"
-import { useScreenSquareBounds } from "./-use-screen-bounds"
+import { useLabelStore } from "./-label-store"
 
 const LAYER_ID = "preview-bounds-layer"
 
-export function PreviewBoundsLayer() {
-    const bounds = useScreenSquareBounds()
+export function useBoundsOutlineLayer() {
+    const bounds = useLabelStore((s) => s.bounds)
 
     useDeckLayer({
         [LAYER_ID]: new PolygonLayer<Bounds>({
@@ -21,6 +21,4 @@ export function PreviewBoundsLayer() {
             lineWidthUnits: "pixels",
         }),
     })
-
-    return null
 }
