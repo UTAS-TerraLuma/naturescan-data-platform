@@ -23,33 +23,23 @@ export function LabellingControls() {
     const nounPhrase = useLabelStore((s) => s.nounPhrase)
     const setNounPhrase = useLabelStore((s) => s.setNounPhrase)
 
-    const handleSubmit = useCallback(() => {
-        if (!locked) return
-        if (document.activeElement?.tagName === "INPUT") return
-        // TODO: wire to segmentation submit
-    }, [locked])
+    const clearPrompts = useLabelStore((s) => s.clearPrompts)
 
-    const handleClear = useCallback(() => {
-        if (!locked) return
-        // TODO: wire to segmentation clear
-        setNounPhrase("")
-    }, [locked, setNounPhrase])
+    const togglePromptMode = useCallback(
+        () => setPromptMode(promptMode == "pvs" ? "pcs" : "pvs"),
+        [promptMode],
+    )
 
-    const handleToggleMode = useCallback(() => {
-        if (!locked) return
-        setPromptMode(promptMode === "pvs" ? "pcs" : "pvs")
-    }, [locked, promptMode, setPromptMode])
-
-    const handleToggleSimpleMode = useCallback(() => {
-        if (!locked || promptMode !== "pvs") return
-        togglePvsSimpleMode()
-    }, [locked, promptMode, togglePvsSimpleMode])
+    const sumbitPrompts = useCallback(() => {
+        console.log("SUBMIT PROMPTS")
+        clearPrompts()
+    }, [promptMode])
 
     useKeyPress("l", toggleLocked)
-    useKeyPress("Enter", handleSubmit)
-    useKeyPress("Escape", handleClear)
-    useKeyPress("m", handleToggleMode)
-    useKeyPress("s", handleToggleSimpleMode)
+    useKeyPress("Enter", sumbitPrompts)
+    useKeyPress("Escape", clearPrompts)
+    useKeyPress("m", togglePromptMode)
+    useKeyPress("s", togglePvsSimpleMode)
 
     return (
         <>
@@ -116,10 +106,16 @@ export function LabellingControls() {
                             </button>
                         ) : (
                             <div className="flex gap-2">
-                                <button className="px-2 py-1 text-xs rounded-sm bg-foreground/10 text-foreground hover:bg-foreground/20 transition-colors cursor-pointer flex items-center gap-1.5">
+                                <button
+                                    onClick={sumbitPrompts}
+                                    className="px-2 py-1 text-xs rounded-sm bg-foreground/10 text-foreground hover:bg-foreground/20 transition-colors cursor-pointer flex items-center gap-1.5"
+                                >
                                     Submit <KBD>↵</KBD>
                                 </button>
-                                <button className="px-2 py-1 text-xs rounded-sm bg-foreground/10 text-muted-foreground hover:bg-foreground/20 transition-colors cursor-pointer flex items-center gap-1.5">
+                                <button
+                                    onClick={clearPrompts}
+                                    className="px-2 py-1 text-xs rounded-sm bg-foreground/10 text-muted-foreground hover:bg-foreground/20 transition-colors cursor-pointer flex items-center gap-1.5"
+                                >
                                     Clear <KBD>Esc</KBD>
                                 </button>
                             </div>
@@ -148,7 +144,10 @@ export function LabellingControls() {
                             <button className="px-2 py-1 text-xs rounded-sm bg-foreground/10 text-foreground hover:bg-foreground/20 transition-colors cursor-pointer flex items-center gap-1.5">
                                 Submit <KBD>↵</KBD>
                             </button>
-                            <button className="px-2 py-1 text-xs rounded-sm bg-foreground/10 text-muted-foreground hover:bg-foreground/20 transition-colors cursor-pointer flex items-center gap-1.5">
+                            <button
+                                onClick={clearPrompts}
+                                className="px-2 py-1 text-xs rounded-sm bg-foreground/10 text-muted-foreground hover:bg-foreground/20 transition-colors cursor-pointer flex items-center gap-1.5"
+                            >
                                 Clear <KBD>Esc</KBD>
                             </button>
                         </div>

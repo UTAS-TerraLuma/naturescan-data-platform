@@ -1,9 +1,8 @@
+import { type VisualPrompt, type ConceptPrompt } from "./-prompt-types"
 import {
-    predictionResultsSchema,
-    type PredictionResult,
-    type VisualPrompt,
-    type ConceptPrompt,
-} from "./-types"
+    type SegmentationResult,
+    segmentationResultsSchema,
+} from "./-segment-result-schema"
 
 const API_URL = import.meta.env.VITE_SEGMENTATION_API
 
@@ -20,7 +19,7 @@ export async function setImage(image: string): Promise<void> {
 export async function predict(
     image: string,
     prompt: VisualPrompt | ConceptPrompt | null,
-): Promise<PredictionResult[]> {
+): Promise<SegmentationResult[]> {
     const body = { image, prompt }
 
     const res = await fetch(`${API_URL}/predict`, {
@@ -30,5 +29,5 @@ export async function predict(
     })
     if (!res.ok) throw new Error(`pvs failed: ${res.status}`)
     const json = await res.json()
-    return predictionResultsSchema.parse(json)
+    return segmentationResultsSchema.parse(json)
 }

@@ -42,7 +42,7 @@ const pcsPromptSchema = z.object({
     ),
 })
 
-export const predictionResultsSchema = z.array(
+export const segmentationResultsSchema = z.array(
     z.object({
         id: z.string(),
         image: z.url(),
@@ -51,4 +51,6 @@ export const predictionResultsSchema = z.array(
     }),
 )
 
-export type PredictionResult = z.infer<typeof predictionResultsSchema>[number]
+export type SegmentationResult = z.infer<
+    typeof segmentationResultsSchema
+>[number]
