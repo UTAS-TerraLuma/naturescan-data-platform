@@ -1,35 +1,35 @@
 services:
-  caddy:
-    image: caddy:latest
-    # Open ports required for web traffic and HTTPS
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      # Copy over caddy file (read only)
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      # Persists caddy data so we aren't constantly
-      # requesting new HTTPS certs
-      - caddy_data:/data
-      - caddy_config:/config
-    depends_on:
-      - api-stac
-      - api-titiler
-      - web-app
+    caddy:
+        image: caddy:latest
+        # Open ports required for web traffic and HTTPS
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            # Copy over caddy file (read only)
+            - ./Caddyfile:/etc/caddy/Caddyfile:ro
+            # Persists caddy data so we aren't constantly
+            # requesting new HTTPS certs
+            - caddy_data:/data
+            - caddy_config:/config
+        depends_on:
+            - api-stac
+            - api-titiler
+            - web-app
 
-  web-app:
-    image: jmswsc/web-app:latest
+    web-app:
+        image: jmswsc/web-app:latest
 
-  api-stac:
-    image: jmswsc/api-stac:latest
+    api-stac:
+        image: jmswsc/api-stac:latest
 
-  api-titiler:
-    image: ghcr.io/developmentseed/titiler:latest
-    environment:
-      # Not sure how restrict properly without errors
-      - TITILER_API_CORS_ORIGINS=*
-      - WEB_CONCURRENCY=6
+    api-titiler:
+        image: ghcr.io/developmentseed/titiler:latest
+        environment:
+            # Not sure how restrict properly without errors
+            - TITILER_API_CORS_ORIGINS=*
+            - WEB_CONCURRENCY=6
 
 volumes:
-  caddy_data:
-  caddy_config:
+    caddy_data:
+    caddy_config:
