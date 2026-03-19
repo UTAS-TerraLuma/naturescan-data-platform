@@ -29,7 +29,7 @@ export function ResultsLayer() {
     })
 
     useDeckLayer({
-        [LAYER_ID]: resultsLayer,
+        [LAYER_ID]: { layer: resultsLayer, zIndex: 12 },
     })
 
     return null

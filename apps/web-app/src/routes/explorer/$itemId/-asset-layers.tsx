@@ -31,65 +31,75 @@ export function AssetLayers() {
     const mMsParams = useMsSearchParams()
     const msUrl = getTilesUrl(mMsParams)
 
+    const rgbLayer = new TileLayer({
+        id: RGB_ORTHO_ID,
+        visible: selectedAsset == "rgb",
+        extent: item.bbox,
+        data: rgbUrl,
+        minZoom: 18,
+
+        opacity,
+        refinementStrategy,
+
+        renderSubLayers: (props) => {
+            const { boundingBox } = props.tile
+
+            return new BitmapLayer(props, {
+                data: undefined,
+                image: props.data,
+                bounds: [
+                    boundingBox[0][0],
+                    boundingBox[0][1],
+                    boundingBox[1][0],
+                    boundingBox[1][1],
+                ],
+                textureParameters: {
+                    minFilter: "nearest",
+                    magFilter: "nearest",
+                },
+            })
+        },
+    })
+
+    const msLayer = new TileLayer({
+        id: MS_ORTHO_ID,
+        visible: selectedAsset == "ms",
+        extent: item.bbox,
+        data: msUrl,
+        minZoom: 18,
+
+        opacity,
+        refinementStrategy,
+
+        renderSubLayers: (props) => {
+            const { boundingBox } = props.tile
+
+            return new BitmapLayer(props, {
+                data: undefined,
+                image: props.data,
+                bounds: [
+                    boundingBox[0][0],
+                    boundingBox[0][1],
+                    boundingBox[1][0],
+                    boundingBox[1][1],
+                ],
+                textureParameters: {
+                    minFilter: "nearest",
+                    magFilter: "nearest",
+                },
+            })
+        },
+    })
+
     useDeckLayer({
-        [RGB_ORTHO_ID]: new TileLayer({
-            id: RGB_ORTHO_ID,
-            visible: selectedAsset == "rgb",
-            extent: item.bbox,
-            data: rgbUrl,
-            minZoom: 18,
-
-            opacity,
-            refinementStrategy,
-
-            renderSubLayers: (props) => {
-                const { boundingBox } = props.tile
-
-                return new BitmapLayer(props, {
-                    data: undefined,
-                    image: props.data,
-                    bounds: [
-                        boundingBox[0][0],
-                        boundingBox[0][1],
-                        boundingBox[1][0],
-                        boundingBox[1][1],
-                    ],
-                    textureParameters: {
-                        minFilter: "nearest",
-                        magFilter: "nearest",
-                    },
-                })
-            },
-        }),
-        [MS_ORTHO_ID]: new TileLayer({
-            id: MS_ORTHO_ID,
-            visible: selectedAsset == "ms",
-            extent: item.bbox,
-            data: msUrl,
-            minZoom: 18,
-
-            opacity,
-            refinementStrategy,
-
-            renderSubLayers: (props) => {
-                const { boundingBox } = props.tile
-
-                return new BitmapLayer(props, {
-                    data: undefined,
-                    image: props.data,
-                    bounds: [
-                        boundingBox[0][0],
-                        boundingBox[0][1],
-                        boundingBox[1][0],
-                        boundingBox[1][1],
-                    ],
-                    textureParameters: {
-                        minFilter: "nearest",
-                        magFilter: "nearest",
-                    },
-                })
-            },
-        }),
+        [RGB_ORTHO_ID]: {
+            layer: rgbLayer,
+            zIndex: 0,
+        },
+        [MS_ORTHO_ID]: {
+            layer: msLayer,
+            zIndex: 0,
+        },
     })
 
     return null

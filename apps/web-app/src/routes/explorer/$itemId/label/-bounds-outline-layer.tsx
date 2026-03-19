@@ -8,18 +8,23 @@ const LAYER_ID = "preview-bounds-layer"
 export function BoundsOutlineLayer() {
     const bounds = useLabelStore((s) => s.bounds)
 
-    useDeckLayer({
-        [LAYER_ID]: new PolygonLayer<Bounds>({
-            id: LAYER_ID,
-            data: [bounds],
-            getPolygon: (d) => polygonFromBounds(d),
-            stroked: true,
-            filled: false,
+    const layer = new PolygonLayer<Bounds>({
+        id: LAYER_ID,
+        data: [bounds],
+        getPolygon: (d) => polygonFromBounds(d),
+        stroked: true,
+        filled: false,
 
-            getLineColor: [255, 255, 255],
-            getLineWidth: 2,
-            lineWidthUnits: "pixels",
-        }),
+        getLineColor: [255, 255, 255],
+        getLineWidth: 2,
+        lineWidthUnits: "pixels",
+    })
+
+    useDeckLayer({
+        [LAYER_ID]: {
+            layer,
+            zIndex: 10,
+        },
     })
 
     return null

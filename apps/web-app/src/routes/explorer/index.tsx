@@ -32,54 +32,60 @@ function RouteComponent() {
     }, [items, isDeckReady])
 
     useDeckLayer({
-        [ITEMS_SCATTER_ID]: new ScatterplotLayer<StacItem>({
-            id: ITEMS_SCATTER_ID,
-            data: items,
-            getPosition: ({ bbox }) => [
-                (bbox[0] + bbox[2]) / 2,
-                (bbox[1] + bbox[3]) / 2,
-            ],
-            getRadius: 10,
-            getFillColor: [255, 0, 0],
-            radiusUnits: "pixels",
+        [ITEMS_SCATTER_ID]: {
+            layer: new ScatterplotLayer<StacItem>({
+                id: ITEMS_SCATTER_ID,
+                data: items,
+                getPosition: ({ bbox }) => [
+                    (bbox[0] + bbox[2]) / 2,
+                    (bbox[1] + bbox[3]) / 2,
+                ],
+                getRadius: 10,
+                getFillColor: [255, 0, 0],
+                radiusUnits: "pixels",
 
-            pickable: true,
-            onClick: (info) => {
-                if (!info.object) return
+                pickable: true,
+                onClick: (info) => {
+                    if (!info.object) return
 
-                const item: StacItem = info.object
+                    const item: StacItem = info.object
 
-                navigate({
-                    to: "/explorer/$itemId",
-                    params: { itemId: item.id },
-                })
-            },
+                    navigate({
+                        to: "/explorer/$itemId",
+                        params: { itemId: item.id },
+                    })
+                },
 
-            visible: zoom < 12.5,
-        }),
-        [ITEMS_POLYGON_ID]: new PolygonLayer<StacItem>({
-            id: "items-polygons",
-            data: items,
-            getPolygon: (d) => d.geometry.coordinates,
-            filled: true,
-            getFillColor: [255, 0, 0, 100],
-            stroked: true,
-            getLineColor: [255, 0, 0],
+                visible: zoom < 12.5,
+            }),
+            zIndex: 1,
+        },
+        [ITEMS_POLYGON_ID]: {
+            layer: new PolygonLayer<StacItem>({
+                id: "items-polygons",
+                data: items,
+                getPolygon: (d) => d.geometry.coordinates,
+                filled: true,
+                getFillColor: [255, 0, 0, 100],
+                stroked: true,
+                getLineColor: [255, 0, 0],
 
-            pickable: true,
-            onClick: (info) => {
-                if (!info.object) return
+                pickable: true,
+                onClick: (info) => {
+                    if (!info.object) return
 
-                const item: StacItem = info.object
+                    const item: StacItem = info.object
 
-                navigate({
-                    to: "/explorer/$itemId",
-                    params: { itemId: item.id },
-                })
-            },
+                    navigate({
+                        to: "/explorer/$itemId",
+                        params: { itemId: item.id },
+                    })
+                },
 
-            visible: zoom >= 12.5,
-        }),
+                visible: zoom >= 12.5,
+            }),
+            zIndex: 1,
+        },
     })
 
     return (

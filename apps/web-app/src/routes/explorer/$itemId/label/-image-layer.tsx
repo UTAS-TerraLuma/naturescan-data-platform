@@ -48,7 +48,7 @@ export function ImageLayer() {
     })
 
     useDeckLayer({
-        [LAYER_ID]: bitmapLayer,
+        [LAYER_ID]: { layer: bitmapLayer, zIndex: 11 },
     })
 
     return null

@@ -52,7 +52,8 @@ type Size = {
     height: number
 }
 
-type LayersObject = Record<string, Layer | null>
+type LayerEntry = { layer: Layer | null; zIndex: number }
+type LayersObject = Record<string, LayerEntry>
 
 interface DeckStore {
     deck: Deck | null
@@ -178,4 +179,6 @@ export function fitBounds([xmin, ymin, xmax, ymax]: Bounds) {
 export function useLayers() {
     const layerObject = useDeck((s) => s.layers)
     return Object.values(layerObject)
+        .sort((a, b) => a.zIndex - b.zIndex)
+        .map((e) => e.layer)
 }

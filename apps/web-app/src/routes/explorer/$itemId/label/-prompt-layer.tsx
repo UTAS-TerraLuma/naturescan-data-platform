@@ -187,11 +187,11 @@ export function PromptLayer() {
     }, [])
 
     useDeckLayer({
-        "interaction-layer": interactionLayer,
-        "points-layer": pointsLayer,
-        "preview-bbox-layer": previewBboxLayer,
-        "bbox-layer": bboxLayer,
-        "exemplars-layer": exemplarsLayer,
+        "interaction-layer": { layer: interactionLayer, zIndex: 20 },
+        "points-layer": { layer: pointsLayer, zIndex: 20 },
+        "preview-bbox-layer": { layer: previewBboxLayer, zIndex: 20 },
+        "bbox-layer": { layer: bboxLayer, zIndex: 20 },
+        "exemplars-layer": { layer: exemplarsLayer, zIndex: 20 },
     })
 
     return null
