@@ -18,6 +18,7 @@ import { WebMercatorViewport } from "@math.gl/web-mercator"
 import { IMAGE_SIZE } from "./-image-layer"
 import { boundsToCorners } from "@/lib/spatial-utils"
 import { projectPrompt, unprojectResultToFeature } from "./-labelling-utils"
+import { useItemStore } from "../-item-store"
 
 const KBD = ({ children }: { children: React.ReactNode }) => (
     <kbd className="bg-muted text-muted-foreground h-5 w-fit min-w-5 rounded-sm px-1 font-mono text-xs font-medium inline-flex items-center justify-center select-none ring ring-foreground/10">
@@ -26,6 +27,7 @@ const KBD = ({ children }: { children: React.ReactNode }) => (
 )
 
 export function LabellingControls() {
+    const surveyUID = useItemStore((s) => s.itemId)
     // ---- Locked ----
     const locked = useLabelStore((s) => s.locked)
     const toggleLocked = useLabelStore((s) => s.toggleLocked)
@@ -56,7 +58,7 @@ export function LabellingControls() {
     }, [imageUrl])
 
     // ---- Predict Mutation ----
-    const addSegmentationFeatures = useLabelStore(
+    const addSegmentationFeatures = useItemStore(
         (s) => s.addSegmentationFeatures,
     )
     const predictMutation = useMutation({
@@ -110,7 +112,7 @@ export function LabellingControls() {
                     const features = results.map((r) =>
                         unprojectResultToFeature(r, viewport),
                     )
-                    addSegmentationFeatures(features)
+                    addSegmentationFeatures(surveyUID, features)
                 },
             },
         )

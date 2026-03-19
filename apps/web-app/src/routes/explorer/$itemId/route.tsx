@@ -11,10 +11,14 @@ import { useEffect } from "react"
 import { Assets } from "./-assets"
 import { ItemSummary } from "./-item-summary"
 import { ItemProvider } from "./-item-provider"
+import { useItemStore } from "./-item-store"
+import { ResultsLayer } from "./-results-layer"
 
 export const Route = createFileRoute("/explorer/$itemId")({
-    loader: ({ context, params: { itemId } }) =>
-        context.queryClient.ensureQueryData(nsItemByIdQuery(itemId)),
+    loader: ({ context, params: { itemId } }) => {
+        context.queryClient.ensureQueryData(nsItemByIdQuery(itemId))
+        useItemStore.getState().setItemId(itemId)
+    },
 
     component: RouteComponent,
 })
@@ -38,6 +42,7 @@ function RouteComponent() {
         <ItemProvider item={item}>
             <ItemSummary />
             <Assets />
+            <ResultsLayer />
             {isExactMatch && (
                 <Link
                     to="/explorer/$itemId/label"

@@ -1,17 +1,15 @@
 import { useDeckLayer } from "@/stores/deck-store"
-import { useLabelStore } from "./-label-store"
 import { PolygonLayer } from "@deck.gl/layers"
-import type { SegmentationFeature } from "./-segment-result-schema"
-import { useEffect } from "react"
+import type { SegmentationFeature } from "./label/-segment-result-schema"
+import { useItemStore } from "./-item-store"
 
 const LAYER_ID = "zzz-results-layer"
 
 export function ResultsLayer() {
-    const features = useLabelStore((s) => s.segmentationFeatures)
+    const itemId = useItemStore((s) => s.itemId)
+    const allFeatures = useItemStore((s) => s.segmentationFeatures)
 
-    useEffect(() => {
-        console.log(features)
-    }, [features])
+    const features = allFeatures[itemId] ?? []
 
     const resultsLayer = new PolygonLayer<SegmentationFeature>({
         id: LAYER_ID,
