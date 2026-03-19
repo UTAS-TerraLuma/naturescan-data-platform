@@ -12,6 +12,9 @@ interface ItemStore {
         features: SegmentationFeature[],
     ) => void
     deleteSegmentationFeature: (itemId: string, featureId: string) => void
+
+    selectedSegmentation: string | null
+    setSelectedSegmentation: (segmentationId: string | null) => void
 }
 
 export const useItemStore = create<ItemStore>()(
@@ -43,6 +46,9 @@ export const useItemStore = create<ItemStore>()(
                         ),
                     },
                 })),
+            selectedSegmentation: null,
+            setSelectedSegmentation: (segmentationId: string | null) =>
+                set({ selectedSegmentation: segmentationId }),
         }),
         {
             name: "item",

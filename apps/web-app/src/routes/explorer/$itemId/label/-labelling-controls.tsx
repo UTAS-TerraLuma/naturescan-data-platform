@@ -73,7 +73,7 @@ export function LabellingControls() {
         onSettled: clearPrompts,
     })
 
-    const sumbitPrompts = () => {
+    const submitPrompts = () => {
         const state = useLabelStore.getState()
         let viewport = new WebMercatorViewport({
             width: IMAGE_SIZE,
@@ -118,8 +118,20 @@ export function LabellingControls() {
         )
     }
 
+    const points = useLabelStore((s) => s.points)
+    const bbox = useLabelStore((s) => s.bbox)
+
+    // Auto submit during simple mode
+    useEffect(() => {
+        if (promptMode == "pvs" && pvsSimpleMode) {
+            if (points.length > 0 || bbox) {
+                submitPrompts()
+            }
+        }
+    }, [promptMode, pvsSimpleMode, points, bbox])
+
     useKeyPress("l", toggleLocked)
-    useKeyPress("Enter", sumbitPrompts)
+    useKeyPress("Enter", submitPrompts)
     useKeyPress("Escape", clearPrompts)
     useKeyPress("m", togglePromptMode)
     useKeyPress("s", togglePvsSimpleMode)
@@ -188,13 +200,16 @@ export function LabellingControls() {
                             </Switch.Root>
                         </Field.Root>
                         {pvsSimpleMode ? (
-                            <button className="px-2 py-1 text-xs rounded-sm bg-foreground/10 text-foreground hover:bg-foreground/20 transition-colors cursor-pointer w-fit flex items-center gap-1.5">
+                            <button
+                                onClick={submitPrompts}
+                                className="px-2 py-1 text-xs rounded-sm bg-foreground/10 text-foreground hover:bg-foreground/20 transition-colors cursor-pointer w-fit flex items-center gap-1.5"
+                            >
                                 Segment All <KBD>↵</KBD>
                             </button>
                         ) : (
                             <div className="flex gap-2">
                                 <button
-                                    onClick={sumbitPrompts}
+                                    onClick={submitPrompts}
                                     className="px-2 py-1 text-xs rounded-sm bg-foreground/10 text-foreground hover:bg-foreground/20 transition-colors cursor-pointer flex items-center gap-1.5"
                                 >
                                     Submit <KBD>↵</KBD>
@@ -228,7 +243,10 @@ export function LabellingControls() {
                             />
                         </Field.Root>
                         <div className="flex gap-2">
-                            <button className="px-2 py-1 text-xs rounded-sm bg-foreground/10 text-foreground hover:bg-foreground/20 transition-colors cursor-pointer flex items-center gap-1.5">
+                            <button
+                                onClick={submitPrompts}
+                                className="px-2 py-1 text-xs rounded-sm bg-foreground/10 text-foreground hover:bg-foreground/20 transition-colors cursor-pointer flex items-center gap-1.5"
+                            >
                                 Submit <KBD>↵</KBD>
                             </button>
                             <button

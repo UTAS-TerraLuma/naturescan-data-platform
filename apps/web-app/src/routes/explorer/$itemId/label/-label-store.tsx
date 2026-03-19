@@ -33,7 +33,7 @@ interface LabelStore {
     clearPrompts: () => void
 }
 
-export const useLabelStore = create<LabelStore>((set) => ({
+export const useLabelStore = create<LabelStore>((set, get) => ({
     locked: false,
     toggleLocked: () =>
         set((s) => ({
@@ -47,11 +47,21 @@ export const useLabelStore = create<LabelStore>((set) => ({
     setBounds: (bounds) => set({ bounds }),
 
     promptMode: "pvs",
-    setPromptMode: (mode) => set({ promptMode: mode }),
+    setPromptMode: (mode) =>
+        set((state) => {
+            // cleare prompts before toggling prompt mode
+            if (state.promptMode != mode) {
+                get().clearPrompts()
+            }
+
+            return { promptMode: mode }
+        }),
 
     pvsSimpleMode: false,
-    togglePvsSimpleMode: () =>
-        set((s) => ({ pvsSimpleMode: !s.pvsSimpleMode })),
+    togglePvsSimpleMode: () => {
+        get().clearPrompts() // clear prompts before toggling simple mode
+        set((s) => ({ pvsSimpleMode: !s.pvsSimpleMode }))
+    },
 
     nounPhrase: "",
     setNounPhrase: (phrase) => set({ nounPhrase: phrase }),
