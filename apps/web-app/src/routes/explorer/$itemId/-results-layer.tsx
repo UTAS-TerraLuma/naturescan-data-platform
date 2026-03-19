@@ -4,8 +4,9 @@ import type { SegmentationFeature } from "./label/-segment-result-schema"
 import { useItemStore } from "./-item-store"
 import { useKeyPress } from "@/hooks/useKeyPress"
 import { useEffect } from "react"
+import { OverlaySection } from "@/components/overlays/overlay-section"
 
-const LAYER_ID = "zzz-results-layer"
+const LAYER_ID = "results-layer"
 
 export function ResultsLayer() {
     const itemId = useItemStore((s) => s.itemId)
@@ -70,5 +71,32 @@ export function ResultsLayer() {
         setSelectedSegment(null)
     })
 
-    return null
+    function downloadGeoJSON() {
+        const collection = {
+            type: "FeatureCollection",
+            features,
+        }
+        const blob = new Blob([JSON.stringify(collection, null, 2)], {
+            type: "application/json",
+        })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = `segmentations-${itemId}.geojson`
+        a.click()
+        URL.revokeObjectURL(url)
+    }
+
+    return (
+        <OverlaySection title="Segmentations" muted>
+            {features.length > 0 && (
+                <button
+                    onClick={downloadGeoJSON}
+                    className="text-xs text-blue-400 hover:text-blue-300 underline"
+                >
+                    Download GeoJSON ({features.length})
+                </button>
+            )}
+        </OverlaySection>
+    )
 }
