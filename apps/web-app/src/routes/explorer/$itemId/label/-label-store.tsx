@@ -1,10 +1,14 @@
 import type { Bounds } from "@/lib/spatial-utils"
 import { create } from "zustand"
 import type { BBoxPrompt, PointPrompt, PromptMode } from "./-prompt-types"
+import type { SegmentationFeature } from "./-segment-result-schema"
 
 interface LabelStore {
     locked: boolean
     toggleLocked: () => void
+
+    imageUrl: string | null
+    setImageUrl: (imageUrl: string | null) => void
 
     bounds: Bounds
     setBounds: (bounds: Bounds) => void
@@ -28,6 +32,10 @@ interface LabelStore {
     addExemplar: (e: BBoxPrompt) => void
 
     clearPrompts: () => void
+
+    segmentationFeatures: SegmentationFeature[]
+    addSegmentationFeatures: (s: SegmentationFeature[]) => void
+    deleteSegmentationFeature: (id: string) => void
 }
 
 export const useLabelStore = create<LabelStore>((set) => ({
@@ -36,6 +44,9 @@ export const useLabelStore = create<LabelStore>((set) => ({
         set((s) => ({
             locked: !s.locked,
         })),
+
+    imageUrl: null,
+    setImageUrl: (imageUrl) => set({ imageUrl }),
 
     bounds: [0, 0, 0, 0],
     setBounds: (bounds) => set({ bounds }),
@@ -60,4 +71,18 @@ export const useLabelStore = create<LabelStore>((set) => ({
     addExemplar: (e) => set((s) => ({ exemplars: [...s.exemplars, e] })),
 
     clearPrompts: () => set({ points: [], bbox: null, exemplars: [] }),
+
+    segmentationFeatures: [],
+    addSegmentationFeatures: (sf) =>
+        set((state) => ({
+            segmentationFeatures: [...state.segmentationFeatures, ...sf],
+        })),
+
+    deleteSegmentationFeature: (id) => {
+        set((state) => ({
+            segmentationFeatures: state.segmentationFeatures.filter(
+                (s) => s.properties.id !== id,
+            ),
+        }))
+    },
 }))

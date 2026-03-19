@@ -2,10 +2,22 @@ import { Tabs } from "@base-ui/react/tabs"
 import { Switch } from "@base-ui/react/switch"
 import { Field } from "@base-ui/react/field"
 import { Input } from "@base-ui/react/input"
-import { useCallback } from "react"
+import { useCallback, useEffect } from "react"
 import { useKeyPress } from "@/hooks/useKeyPress"
 import { useLabelStore } from "./-label-store"
-import type { PromptMode } from "./-prompt-types"
+import type {
+    ConceptPrompt,
+    Prompt,
+    PromptMode,
+    VisualPrompt,
+} from "./-prompt-types"
+import { useMutation } from "@tanstack/react-query"
+import { predict, setImage } from "./-api"
+import { ImageStatusIndicator } from "./-image-status-indicator"
+import { WebMercatorViewport } from "@math.gl/web-mercator"
+import { IMAGE_SIZE } from "./-image-layer"
+import { boundsToCorners } from "@/lib/spatial-utils"
+import { projectPrompt, unprojectResultToFeature } from "./-labelling-utils"
 
 const KBD = ({ children }: { children: React.ReactNode }) => (
     <kbd className="bg-muted text-muted-foreground h-5 w-fit min-w-5 rounded-sm px-1 font-mono text-xs font-medium inline-flex items-center justify-center select-none ring ring-foreground/10">
@@ -14,26 +26,95 @@ const KBD = ({ children }: { children: React.ReactNode }) => (
 )
 
 export function LabellingControls() {
+    // ---- Locked ----
     const locked = useLabelStore((s) => s.locked)
     const toggleLocked = useLabelStore((s) => s.toggleLocked)
+
+    // ---- Prompts State ----
     const promptMode = useLabelStore((s) => s.promptMode)
     const setPromptMode = useLabelStore((s) => s.setPromptMode)
     const pvsSimpleMode = useLabelStore((s) => s.pvsSimpleMode)
     const togglePvsSimpleMode = useLabelStore((s) => s.togglePvsSimpleMode)
     const nounPhrase = useLabelStore((s) => s.nounPhrase)
     const setNounPhrase = useLabelStore((s) => s.setNounPhrase)
-
     const clearPrompts = useLabelStore((s) => s.clearPrompts)
-
     const togglePromptMode = useCallback(
         () => setPromptMode(promptMode == "pvs" ? "pcs" : "pvs"),
         [promptMode],
     )
 
-    const sumbitPrompts = useCallback(() => {
-        console.log("SUBMIT PROMPTS")
-        clearPrompts()
-    }, [promptMode])
+    const imageUrl = useLabelStore((s) => s.imageUrl)
+
+    // ---- Set Image Mutation -----
+    const setImageMutation = useMutation({
+        mutationFn: (image: string) => setImage(image),
+    })
+    useEffect(() => {
+        if (imageUrl) {
+            setImageMutation.mutate(imageUrl)
+        }
+    }, [imageUrl])
+
+    // ---- Predict Mutation ----
+    const addSegmentationFeatures = useLabelStore(
+        (s) => s.addSegmentationFeatures,
+    )
+    const predictMutation = useMutation({
+        mutationFn: ({
+            prompt,
+            imageUrl,
+        }: {
+            prompt: Prompt | null
+            imageUrl: string
+        }) => predict(imageUrl, prompt),
+        onError: (err) => console.error("PVS error:", err),
+        onSettled: clearPrompts,
+    })
+
+    const sumbitPrompts = () => {
+        const state = useLabelStore.getState()
+        let viewport = new WebMercatorViewport({
+            width: IMAGE_SIZE,
+            height: IMAGE_SIZE,
+        }).fitBounds(boundsToCorners(state.bounds))
+
+        let prompt: Prompt | null = null
+        if (
+            state.promptMode === "pvs" &&
+            !state.bbox &&
+            state.points.length == 0
+        ) {
+            prompt = null
+        } else if (state.promptMode === "pvs") {
+            const visualPrompt: VisualPrompt = {
+                type: "visual",
+                bbox: state.bbox,
+                points: state.points,
+            }
+            prompt = visualPrompt
+        } else if (state.promptMode === "pcs") {
+            const { nounPhrase, exemplars } = state
+
+            const conceptPrompt: ConceptPrompt = {
+                type: "concept",
+                text: nounPhrase,
+                exemplars: exemplars,
+            }
+            prompt = conceptPrompt
+        }
+        prompt = projectPrompt(prompt, viewport)
+        predictMutation.mutate(
+            { imageUrl: state.imageUrl!, prompt },
+            {
+                onSuccess: (results) => {
+                    const features = results.map((r) =>
+                        unprojectResultToFeature(r, viewport),
+                    )
+                    addSegmentationFeatures(features)
+                },
+            },
+        )
+    }
 
     useKeyPress("l", toggleLocked)
     useKeyPress("Enter", sumbitPrompts)
@@ -56,6 +137,10 @@ export function LabellingControls() {
                     <Switch.Thumb className="block h-4 w-4 translate-x-0.5 rounded-full bg-background shadow transition-transform data-checked:translate-x-4" />
                 </Switch.Root>
             </Field.Root>
+
+            {locked && (
+                <ImageStatusIndicator status={setImageMutation.status} />
+            )}
 
             {locked && (
                 <Tabs.Root

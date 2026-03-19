@@ -78,3 +78,8 @@ export function cornersToBounds(corners: BoxCorners): Bounds {
 
     return [xMin, yMin, xMax, yMax]
 }
+
+export function bboxObjToBounds(box: BBoxObj): Bounds {
+    const { xmin, xmax, ymin, ymax } = box
+    return [xmin, ymin, xmax, ymax]
+}

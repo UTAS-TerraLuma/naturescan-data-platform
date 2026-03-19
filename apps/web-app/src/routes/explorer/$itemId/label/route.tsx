@@ -8,6 +8,7 @@ import { useEffect } from "react"
 import { LabellingControls } from "./-labelling-controls"
 import { PromptLayer } from "./-prompt-layer"
 import { ImageLayer } from "./-image-layer"
+import { ResultsLayer } from "./-results-layer"
 
 export const Route = createFileRoute("/explorer/$itemId/label")({
     component: RouteComponent,
@@ -43,6 +44,7 @@ function RouteComponent() {
                     <PromptLayer />
                 </>
             )}
+            <ResultsLayer />
         </>
     )
 }

@@ -4,9 +4,10 @@ import { useLabelStore } from "./-label-store"
 import { useAssetStore } from "../-asset-store"
 import { useMsSearchParams, useRgbSearchParams } from "../-asset-layers"
 import { createTitilerUrl } from "@/lib/titiler"
+import { useEffect } from "react"
 
 const LAYER_ID = "label-image-layer"
-const IMAGE_SIZE = 1036
+export const IMAGE_SIZE = 1036
 
 export function useImageUrl() {
     const selectedAsset = useAssetStore((s) => s.selectedAsset)
@@ -24,24 +25,27 @@ export function useImageUrl() {
 }
 
 export function ImageLayer() {
-    const locked = useLabelStore((s) => s.locked)
     const bounds = useLabelStore((s) => s.bounds)
     const imageUrl = useImageUrl()
+    const setImageUrl = useLabelStore((s) => s.setImageUrl)
 
-    let bitmapLayer: BitmapLayer | null = null
+    useEffect(() => {
+        setImageUrl(imageUrl)
+        return () => {
+            setImageUrl(null)
+        }
+    }, [, imageUrl])
 
-    if (locked) {
-        bitmapLayer = new BitmapLayer({
-            id: LAYER_ID,
-            image: imageUrl,
-            bounds: bounds,
+    const bitmapLayer = new BitmapLayer({
+        id: LAYER_ID,
+        image: imageUrl,
+        bounds: bounds,
 
-            textureParameters: {
-                minFilter: "nearest",
-                magFilter: "nearest",
-            },
-        })
-    }
+        textureParameters: {
+            minFilter: "nearest",
+            magFilter: "nearest",
+        },
+    })
 
     useDeckLayer({
         [LAYER_ID]: bitmapLayer,
