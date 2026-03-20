@@ -1,0 +1,19 @@
+{
+    "site": "NTAFIN0013",
+    "date": "20240925",
+    "site_visit_id": "NTAFIN0013_20240925",
+    "variant": "m3m",
+    "survey_uid": "NTAFIN0013_20240925_m3m",
+    "property": "Henbury Station",
+    "landholder": "Private landholder",
+    "traditional_owner": "Arrernte",
+    "base_station_type": "DJI D-RKT 2",
+    "antenna_height_m": 1.8,
+    "calibration_panel": null,
+    "white_balance": null,
+    "sky_conditions": "Clear skies and sunny",
+    "wind_conditions": "No wind (< 2 m/s)",
+    "base_station_established": "NE picket of AusPlot",
+    "collected_by": "Alice Robbins, Carla Franson",
+    "comments": null
+}

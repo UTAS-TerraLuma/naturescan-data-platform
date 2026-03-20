@@ -1,0 +1,7 @@
+{
+	email james.gregory@utas.edu.au
+}
+
+segment.tern-dronescape.cloud.edu.au {
+	reverse_proxy api-segmentation:8003
+}
