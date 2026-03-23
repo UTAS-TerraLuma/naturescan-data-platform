@@ -1,22 +1,30 @@
 # NatureScan Data Platform
 
-This repository contains the code and service definitions for the NatureScan data platform. Currently
-split into:
+This is a meta-repository containing links to other naturescan data platform repositories and documentation.
 
-- `apps/` - Containing the any user facing applications:
-  - `apps/web-app` - The primary web application
-- `services/` - Containing the backend services:
-  - `services/api-titiler` - TiTiler API
-  - `services/api-stac` - STAC API powered by stac-geoparquet
-  - `services/asset-server` - A dev only asset server to serve local files on a URL (for serving COGs and STAC items during dev)
-- `notebooks/` - Any processing / analysis notebooks
-- `notebooks_public/` - TODO: Notebooks for publishing online
+## Repositories
+
+| Repository | Description |
+|---|---|
+| [ns-web-explorer](https://github.com/UTAS-TerraLuma/ns-web-explorer) | Web interface for viewing and interacting with NatureScan drone data |
+| [ns-api-stac](https://github.com/UTAS-TerraLuma/ns-api-stac) | STAC API service using [stac-fastapi-geoparquet](https://github.com/stac-utils/stac-fastapi-geoparquet) |
+| [ns-api-titiler](https://github.com/UTAS-TerraLuma/ns-api-titiler) | TiTiler application for serving drone orthomosaics as XYZ tiles |
+| [ns-api-labelling](https://github.com/UTAS-TerraLuma/ns-api-labelling) | FastAPI server wrapping SAM3 model for interactive image segmentation |
+| [ns-tool-stac](https://github.com/UTAS-TerraLuma/ns-tool-stac) | CLI tool for generating and managing STAC catalogs for NatureScan drone survey data |
+| [ns-tool-metadata](https://github.com/UTAS-TerraLuma/ns-tool-metadata) | Python tool for extracting and managing metadata from DJI WPML (Waypoint Mission Language) files |
+| [ns-deploy](https://github.com/UTAS-TerraLuma/ns-deploy) | Docker and Caddy files for deploying the NatureScan data platform |
+
 
 ## Requirements
 
 Each sub-app handles its own dependencies. You will need:
-- `pnpm` for javascript apps
-- `pixp` for python services
-- `docker` for select services
+- [`pnpm`](https://pnpm.io/installation) and [`vite+`](https://viteplus.dev/guide/) for web apps
+- [`pixi`](https://pixi.sh/latest/) or [`uv`](https://docs.astral.sh/uv/getting-started/installation/) for Python services
+- [`docker`](https://docs.docker.com/get-started/get-docker/) for deployment
 
-## Dev Servers
+
+## Documentation
+
+To Expand
+
+- [STAC Architecture](./STAC_architecture.md) — STAC structure, extensions, and metadata conventions used across the platform
