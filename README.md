@@ -1,3 +1,5 @@
+![NatureScan](assets/ns-banner.png)
+
 # NatureScan Data Platform
 
 This is a meta-repository containing links to other naturescan data platform repositories and documentation.
