@@ -15,7 +15,7 @@ This is a meta-repository containing links to other naturescan data platform rep
 | [ns-tool-stac](https://github.com/UTAS-TerraLuma/ns-tool-stac) | CLI tool for generating and managing STAC catalogs for NatureScan drone survey data |
 | [ns-tool-metadata](https://github.com/UTAS-TerraLuma/ns-tool-metadata) | Python tool for extracting and managing metadata from DJI WPML (Waypoint Mission Language) files |
 | [ns-deploy](https://github.com/UTAS-TerraLuma/ns-deploy) | Docker and Caddy files for deploying the NatureScan data platform |
-
+| [stac-workshop](https://github.com/UTAS-TerraLuma/stac-workshop) | Workshop notebook and slides on using STAC |
 
 ## Requirements
 
