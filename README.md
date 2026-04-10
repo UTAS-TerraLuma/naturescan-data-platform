@@ -13,6 +13,8 @@ This is a meta-repository containing links to other naturescan data platform rep
 | [ns-api-titiler](https://github.com/UTAS-TerraLuma/ns-api-titiler) | TiTiler application for serving drone orthomosaics as XYZ tiles |
 | [ns-api-labelling](https://github.com/UTAS-TerraLuma/ns-api-labelling) | FastAPI server wrapping SAM3 model for interactive image segmentation |
 | [ns-tool-stac](https://github.com/UTAS-TerraLuma/ns-tool-stac) | CLI tool for generating and managing STAC catalogs for NatureScan drone survey data |
+| [ns-tool-cog](https://github.com/UTAS-TerraLuma/ns-tool-cog) | Tool for converting GeoTiffs into the cCoud Optimised GeoTiff (COG) format via GDAL. |
+| [ns-tool-copc](https://github.com/UTAS-TerraLuma/ns-tool-copc) | Tool for converting point clouds into the cloud optimised point cloud (COPC) format via PDAL. |
 | [ns-tool-metadata](https://github.com/UTAS-TerraLuma/ns-tool-metadata) | Python tool for extracting and managing metadata from DJI WPML (Waypoint Mission Language) files |
 | [ns-deploy](https://github.com/UTAS-TerraLuma/ns-deploy) | Docker and Caddy files for deploying the NatureScan data platform |
 | [stac-workshop](https://github.com/UTAS-TerraLuma/stac-workshop) | Workshop notebook and slides on using STAC |
