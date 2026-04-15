@@ -17,6 +17,7 @@ This is a meta-repository containing links to other naturescan data platform rep
 | [ns-tool-copc](https://github.com/UTAS-TerraLuma/ns-tool-copc) | Tool for converting point clouds into the cloud optimised point cloud (COPC) format via PDAL. |
 | [ns-tool-metadata](https://github.com/UTAS-TerraLuma/ns-tool-metadata) | Python tool for extracting and managing metadata from DJI WPML (Waypoint Mission Language) files |
 | [ns-deploy](https://github.com/UTAS-TerraLuma/ns-deploy) | Docker and Caddy files for deploying the NatureScan data platform |
+| [ns-notebook-examples](https://github.com/UTAS-TerraLuma/ns-notebook-examples) | Example notebooks for working with the NatureScan datasets |
 | [stac-workshop](https://github.com/UTAS-TerraLuma/stac-workshop) | Workshop notebook and slides on using STAC |
 
 ## Requirements
