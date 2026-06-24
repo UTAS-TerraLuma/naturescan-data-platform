@@ -16,6 +16,9 @@ This is a meta-repository containing links to other naturescan data platform rep
 | [ns-tool-cog](https://github.com/UTAS-TerraLuma/ns-tool-cog) | Tool for converting GeoTiffs into the cCoud Optimised GeoTiff (COG) format via GDAL. |
 | [ns-tool-copc](https://github.com/UTAS-TerraLuma/ns-tool-copc) | Tool for converting point clouds into the cloud optimised point cloud (COPC) format via PDAL. |
 | [ns-tool-metadata](https://github.com/UTAS-TerraLuma/ns-tool-metadata) | Python tool for extracting and managing metadata from DJI WPML (Waypoint Mission Language) files |
+| [ns-tool-surveysync](https://github.com/UTAS-TerraLuma/ns-tool-surveysync) | A CLI tool for syncing data between the R drive and local folders |
+| [ns-labelling-tool](https://github.com/UTAS-TerraLuma/ns-labelling-tool) | A standalone tool (python backend + web frontend) for creating annotations on NatureScan surveys |
+| [ns-html-tools](https://github.com/UTAS-TerraLuma/ns-html-tools) | One page HTML tools for working with NatureScan data |
 | [ns-deploy](https://github.com/UTAS-TerraLuma/ns-deploy) | Docker and Caddy files for deploying the NatureScan data platform |
 | [stac-workshop](https://github.com/UTAS-TerraLuma/stac-workshop) | Workshop notebook and slides on using STAC |
 
