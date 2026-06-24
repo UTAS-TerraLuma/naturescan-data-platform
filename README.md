@@ -20,6 +20,7 @@ This is a meta-repository containing links to other naturescan data platform rep
 | [ns-labelling-tool](https://github.com/UTAS-TerraLuma/ns-labelling-tool) | A standalone tool (python backend + web frontend) for creating annotations on NatureScan surveys |
 | [ns-html-tools](https://github.com/UTAS-TerraLuma/ns-html-tools) | One page HTML tools for working with NatureScan data |
 | [ns-deploy](https://github.com/UTAS-TerraLuma/ns-deploy) | Docker and Caddy files for deploying the NatureScan data platform |
+| [ns-notebook-examples](https://github.com/UTAS-TerraLuma/ns-notebook-examples) | Example notebooks for working with the NatureScan datasets |
 | [stac-workshop](https://github.com/UTAS-TerraLuma/stac-workshop) | Workshop notebook and slides on using STAC |
 
 ## Requirements
