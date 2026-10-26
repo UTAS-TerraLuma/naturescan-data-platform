@@ -9,6 +9,7 @@ This is a meta-repository containing links to other naturescan data platform rep
 | Repository                                                                     | Description                                                                                             |
 | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
 | [ns-web-explorer](https://github.com/UTAS-TerraLuma/ns-web-explorer)           | Web interface for viewing and interacting with NatureScan drone data                                    |
+| [ns-explorer-cli](https://github.com/UTAS-TerraLuma/ns-explorer-cli)           | `nsx`: an agent-first CLI for exploring NatureScan drone survey data via its STAC API                   |
 | [ns-api-stac](https://github.com/UTAS-TerraLuma/ns-api-stac)                   | STAC API service using [stac-fastapi-geoparquet](https://github.com/stac-utils/stac-fastapi-geoparquet) |
 | [ns-api-titiler](https://github.com/UTAS-TerraLuma/ns-api-titiler)             | TiTiler application for serving drone orthomosaics as XYZ tiles                                         |
 | [ns-api-labelling](https://github.com/UTAS-TerraLuma/ns-api-labelling)         | FastAPI server wrapping SAM3 model for interactive image segmentation                                   |
