@@ -21,5 +21,4 @@ This is a meta-repository containing links to other naturescan data platform rep
 | [naturescan.earth](https://naturescan.earth)                 | Web explorer for NatureScan drone survey data                                                |
 | [stacapi.naturescan.earth](https://stacapi.naturescan.earth) | STAC API for searching surveys ([API docs](https://stacapi.naturescan.earth/api.html))       |
 | [titiler.naturescan.earth](https://titiler.naturescan.earth) | TiTiler tile server for orthomosaics ([API docs](https://titiler.naturescan.earth/api.html)) |
-| [tools.naturescan.earth](https://tools.naturescan.earth)     | One page HTML tools for working with NatureScan data                                         |
 | [naturescan.earth/nsx](https://naturescan.earth/nsx)         | Installers and binaries for the `nsx` CLI                                                    |
