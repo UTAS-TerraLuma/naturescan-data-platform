@@ -21,9 +21,3 @@ Each sub-app handles its own dependencies. You will need:
 - [`pnpm`](https://pnpm.io/installation) and [`vite+`](https://viteplus.dev/guide/) for web apps
 - [`pixi`](https://pixi.sh/latest/) or [`uv`](https://docs.astral.sh/uv/getting-started/installation/) for Python services
 - [`docker`](https://docs.docker.com/get-started/get-docker/) for deployment
-
-## Documentation
-
-To Expand
-
-- [STAC Architecture](./STAC_architecture.md) — STAC structure, extensions, and metadata conventions used across the platform
